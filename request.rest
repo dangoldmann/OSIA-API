@@ -1,8 +1,5 @@
 @baseUrl = http://localhost:3000
 
-### abriendo la landing page
-GET {{baseUrl}}
-
 ### registrar a un nuevo usuario
 POST {{baseUrl}}/users/register
 Content-Type: application/json
@@ -21,7 +18,7 @@ Content-Type: application/json
 
 {
     "email" : "goldmandan8@gmail.com",
-    "password" : "dan"
+    "password" : "osia"
 }
 
 ### obtener todos los usuarios
