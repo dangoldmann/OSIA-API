@@ -18,7 +18,7 @@ router.post('/register', async (req, res, next) => {
     const valid = await makeSimpleValidation(email) // simple email validation
 
     if(!valid){
-        next(ApiError.badRequest('Please provide a valid email adress'))
+        next(ApiError.badRequest('Invalid email adress'))
         //next(ApiError.badRequest(`Please provide a valid email adress, ${validators[reason].reason}`))
         return
     }
