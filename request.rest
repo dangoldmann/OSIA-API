@@ -67,3 +67,4 @@ Content-Type: application/json
 {
     "imageRoute" : "./images/hands.jpg"
 }
+
