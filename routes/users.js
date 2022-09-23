@@ -2,6 +2,7 @@ const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
 const ApiError = require('../error/ApiError')
 const {makeDeepValidation, makeSimpleValidation} = require('../scripts/emailValidator')
+const jwt = require('jsonwebtoken')
 
 const basePath = '/users'
 
@@ -28,9 +29,17 @@ router.post('/register', async (req, res, next) => {
     const user = await userController.create(userInfo, next)
     
     if(user){
-        res.status(201).send({body: {user}})
-    }
+        const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
+        //res.setHeader('Set-Cookie', [`token=${token}; max-age=86400; HttpOnly`])
+
+        res.status(201).send({
+            body: {
+                user,
+                token
+            }
+        })
+    }
 })
 
 router.post('/login', async (req, res, next) => {
@@ -45,7 +54,18 @@ router.post('/login', async (req, res, next) => {
 
     const user = await userController.login(userInfo, next)
 
-    if(user) {res.send({body: {user}})}
+    if(user) {
+        const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
+
+        //res.setHeader('Set-Cookie', [`token=${token}; max-age=86400; HttpOnly`])
+
+        res.send({
+            body: {
+                user,
+                token
+            }
+        })
+    }
 })
 
 router.get('/all', async (req, res) => {
