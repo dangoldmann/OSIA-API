@@ -1,4 +1,12 @@
 @baseUrl = http://localhost:3000
+# @baseUrl = https://osia-api-production.up.railway.app
+
+### jwt test
+GET {{baseUrl}}
+
+###
+GET {{baseUrl}}/home
+
 
 ### registrar a un nuevo usuario
 POST {{baseUrl}}/users/register
