@@ -13,5 +13,5 @@ const cookieJwtAuth = (req, res, next) => {
         return res.send('Fail')
     }
 }
-
+ 
 module.exports = {cookieJwtAuth}

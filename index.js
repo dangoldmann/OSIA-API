@@ -11,9 +11,7 @@ const {router: testRoutes, basePath: testBasePath} = require('./test')
 
 // middleware
 app.use(express.json())
-app.use(cors({
-    origin: '*'
-}))
+app.use(cors())
 app.use(cookieParser())
 
 //routes
