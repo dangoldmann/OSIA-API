@@ -31,9 +31,15 @@ router.post('/register', async (req, res, next) => {
     if(user){
         const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
-        //res.setHeader('Set-Cookie', [`token=${token}; max-age=86400; HttpOnly`])
-
-        res.status(201).send({
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 86400,
+            withCredentials: true,
+            sameSite: 'none',
+            secure: true
+        })
+        .status(201)
+        .send({
             body: {
                 user,
                 token
@@ -57,9 +63,14 @@ router.post('/login', async (req, res, next) => {
     if(user) {
         const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
-        //res.setHeader('Set-Cookie', [`token=${token}; max-age=86400; HttpOnly`])
-
-        res.send({
+        res.cookie('token', token, {
+            httpOnly: true,
+            maxAge: 86400,
+            withCredentials: true,
+            sameSite: 'none',
+            secure: true
+        })
+        .send({
             body: {
                 user,
                 token

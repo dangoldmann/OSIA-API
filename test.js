@@ -13,7 +13,7 @@ router.get('', (req, res) => {
     const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
     res.setHeader('Set-Cookie', [`token=${token}; max-age=86400; HttpOnly`])
-
+    
     res.redirect('/test/home')
 })
 
