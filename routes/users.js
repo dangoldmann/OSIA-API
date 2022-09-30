@@ -1,28 +1,26 @@
 const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
 const ApiError = require('../error/ApiError')
-const {makeDeepValidation, makeSimpleValidation} = require('../scripts/emailValidator')
 const jwt = require('jsonwebtoken')
+const {body, validationResult} = require('express-validator')
 
 const basePath = '/users'
 
-router.post('/register', async (req, res, next) => {
+router.post('/register', [
+    body('name', 'Ingrese un nombre completo').isLength({min: 3}),
+    body('surname', 'Ingrese un apellido completo').isLength({min: 4}),
+    body('email', 'Ingrese un email valido').isEmail(),
+    body('phone', 'Ingres un número de telefono válido').isMobilePhone(),
+    body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
+],  async (req, res, next) => {
+    const errors = validationResult(req)
+    
+    if(!errors.isEmpty()){
+        next(ApiError.badRequest(errors.array()))
+        return
+    }
+    
     const {name, surname, email, phone, password} = req.body
-    
-    if(!name || !surname || !email || !phone || !password){
-        next(ApiError.badRequest('You must complete all the fields'))
-        return
-    }
-
-    //const {valid, reason, validators} = await makeDeepValidation(email) // deep email validation
-    
-    const valid = await makeSimpleValidation(email) // simple email validation
-
-    if(!valid){
-        next(ApiError.badRequest('Invalid email adress'))
-        //next(ApiError.badRequest(`Please provide a valid email adress, ${validators[reason].reason}`))
-        return
-    }
 
     const userInfo = {name, surname, email, phone, password}
     
