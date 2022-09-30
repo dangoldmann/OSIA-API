@@ -7,7 +7,9 @@ const apiErrorHandler = require('./error/api-error-handler');
 const ApiError = require('./error/ApiError');
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users')
 const {router: radiographyRoutes, basePath: radiographyBasePath} = require('./routes/radiographies')
-const {router: testRoutes, basePath: testBasePath} = require('./test/test')
+const {router: cookiesTestRoutes, basePath: cookiesTestBasePath} = require('./test/cookiesTest')
+const {router: passwordResetTestRoutes, basePath: passwordResetTestBasePath} = require('./test/passwordResetTest')
+
 
 // middleware
 app.use(express.json())
@@ -20,7 +22,8 @@ app.use(cookieParser())
 //routes
 app.use(userBasePath, userRoutes)
 app.use(radiographyBasePath, radiographyRoutes)
-app.use(testBasePath, testRoutes)
+app.use(cookiesTestBasePath, cookiesTestRoutes)
+app.use(passwordResetTestBasePath, passwordResetTestRoutes)
 
 app.use((req, res, next) => {
     console.log(req.path)

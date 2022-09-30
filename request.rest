@@ -68,3 +68,23 @@ Content-Type: application/json
     "imageRoute" : "./images/hands.jpg"
 }
 
+### password reset test
+POST {{baseUrl}}/test/forgot-password
+Content-Type: application/json
+
+{
+    "email" : "goldmandan8@gmail.com"
+}
+
+###
+GET {{baseUrl}}/test/reset-password/1/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdvbGRtYW5kYW44QGdtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE2NjQ1NDg3NjQsImV4cCI6MTY2NDU0OTY2NH0.tU0fWq4eIg762342OqcTrtd8RhEYa46yRkO6fhtKOc8
+
+###
+POST {{baseUrl}}/test/reset-password/1/eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImdvbGRtYW5kYW44QGdtYWlsLmNvbSIsImlkIjoxLCJpYXQiOjE2NjQ1NDg3NjQsImV4cCI6MTY2NDU0OTY2NH0.tU0fWq4eIg762342OqcTrtd8RhEYa46yRkO6fhtKOc8
+Content-Type: application/json
+
+{
+    "password" : "aa",
+    "password2" : "aa"
+
+}
