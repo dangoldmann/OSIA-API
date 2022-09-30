@@ -11,7 +11,7 @@ router.post('/register', [
     body('surname', 'Ingrese un apellido completo').isLength({min: 4}),
     body('email', 'Ingrese un email valido').isEmail(),
     body('phone', 'Ingres un número de telefono válido').isMobilePhone(),
-    body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
+    //body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
 ],  async (req, res, next) => {
     const errors = validationResult(req)
     
@@ -46,7 +46,7 @@ router.post('/register', [
 
 router.post('/login', [
     body('email', 'Ingrese un email valido').isEmail(),
-    body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
+    //body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
 ], async (req, res, next) => {
     const errors = validationResult(req)
 
@@ -92,6 +92,7 @@ router.put('/password-reset', async (req, res, next) => {
     }
 
     userInfo = {email, newPassword}
+
     const passwordReset = await userController.updatePassword(userInfo, next)
     
     if(passwordReset)
