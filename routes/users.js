@@ -38,21 +38,24 @@ router.post('/register', [
         })
         .status(201)
         .send({
-            body: {
-                user,
-                token
-            }
+            user,
+            token
         })
     }
 })
 
-router.post('/login', async (req, res, next) => {
-    const {email, password} = req.body
-    
-    if(!email || !password){
-        next(ApiError.badRequest('You must complete all the fields'))
+router.post('/login', [
+    body('email', 'Ingrese un email valido').isEmail(),
+    body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
+], async (req, res, next) => {
+    const errors = validationResult(req)
+
+    if(!errors.isEmpty()){
+        next(ApiError.badRequest(errors.array()))
         return
     }
+    
+    const {email, password} = req.body
 
     const userInfo = {email, password}
 
@@ -69,10 +72,8 @@ router.post('/login', async (req, res, next) => {
             secure: true
         })
         .send({
-            body: {
-                user,
-                token
-            }
+            user,
+            token        
         })
     }
 })
@@ -95,7 +96,7 @@ router.put('/password-reset', async (req, res, next) => {
     
     if(passwordReset)
     {
-        res.send({body: {passwordReset}})
+        res.send({passwordReset})
     }
 })
 
@@ -112,7 +113,7 @@ router.delete('', async (req, res, next) => {
     
     if(isDeleted)
     {
-        res.send({body: {isDeleted}})
+        res.send({isDeleted})
     }
 })
 

@@ -5,10 +5,8 @@ function apiErrorHandler(err, req, res, next){
 
     if(err instanceof ApiError){
         res.status(err.code).json({
-            body: {
-                error: {
-                    message: err.message
-                }
+            error: {
+                message: err.message
             }
         })
         return

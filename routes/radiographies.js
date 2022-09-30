@@ -17,7 +17,7 @@ router.post('/add', async (req, res, next) => {
     const radiography = await radiographyController.create(radiographyInfo, next)
 
     if(radiography){
-        res.status(201).send({body: {radiography}})
+        res.status(201).send({radiography})
     }
     
 })
@@ -35,7 +35,7 @@ router.get('', async (req, res, next) => {
     const imageRoutes = await radiographyController.getByUserId(userInfo, next)
 
     if(imageRoutes){
-        res.send({body: {imageRoutes}})
+        res.send({imageRoutes})
     }
 })
 
@@ -52,7 +52,7 @@ router.delete('/delete', async (req, res, next) => {
     const isDeleted = await radiographyController.delete(radiographyInfo, next)
 
     if(isDeleted){
-        res.send({body: {isDeleted}})
+        res.send({isDeleted})
     }
 })
 
