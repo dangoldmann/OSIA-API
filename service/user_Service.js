@@ -1,5 +1,5 @@
 const bcrypt = require('bcrypt')
-const db = require('../db')
+const db = require('../db/db')
 const {validateEmail, checkUserExistance} = require('../scripts/dbFunctions')
 const ApiError = require('../error/ApiError')
 
