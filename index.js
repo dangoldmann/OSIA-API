@@ -7,7 +7,7 @@ const apiErrorHandler = require('./error/api-error-handler');
 const ApiError = require('./error/ApiError');
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users')
 const {router: radiographyRoutes, basePath: radiographyBasePath} = require('./routes/radiographies')
-const {router: testRoutes, basePath: testBasePath} = require('./test')
+const {router: testRoutes, basePath: testBasePath} = require('./test/test')
 
 // middleware
 app.use(express.json())
