@@ -2,9 +2,14 @@ const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
 const ApiError = require('../error/ApiError')
 const jwt = require('jsonwebtoken')
-const {body, validationResult} = require('express-validator')
+const {body, validationResult, check} = require('express-validator')
+const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
+const {sendResetPasswordEmail} = require('../controllers/email_Controller')
 
 const basePath = '/users'
+
+//const apiBaseUrl = 'http://localhost:3000'
+const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
 router.post('/register', [
     body('name', 'Ingrese un nombre completo').isLength({min: 3}),
@@ -83,21 +88,96 @@ router.get('/all', async (req, res) => {
     res.send({body: {users}})
 })
 
-router.put('/password-reset', async (req, res, next) => {
-    const {email, newPassword} = req.body
+router.post('/forgot-password', async (req, res, next) => {
+    const {email} = req.body
+
+    // Check the email to the cookie
+    const isUser = await checkUserExistance('email', email)
     
-    if(!email || !newPassword){
-        next(ApiError.badRequest('You must complete all the fields'))
+    if(!isUser){
+        next(ApiError.badRequest('No hay ninguna cuenta asociada con este mail'))
         return
     }
 
-    userInfo = {email, newPassword}
+    const id = await getUserId('email', email)
 
-    const passwordReset = await userController.updatePassword(userInfo, next)
+    const secret = process.env.SECRET_KEY + id
     
-    if(passwordReset)
-    {
-        res.send({passwordReset})
+    const payload = {
+        id,
+        email
+    }
+
+    const token = jwt.sign(payload, secret, {expiresIn: '3h'})
+    const link = `${apiBaseUrl}/users/reset-password/${id}/${token}`
+    
+    sendResetPasswordEmail(email, link)
+
+    res.send({message: 'Password reset link sent to your email'})
+})
+
+router.get('/reset-password/:id/:token', async (req, res, next) => {
+    const {id, token} = req.params
+    
+    const isUser = await checkUserExistance('id', id)
+
+    if(!isUser){
+        next(ApiError.badRequest('Id not valid'))
+        return
+    }
+
+    const secret = process.env.SECRET_KEY + id
+
+    try {
+        const payload = jwt.verify(token, secret)
+        res.render('../views/reset-password')
+    } catch (error) {
+        console.log(error.message)
+        res.send(error.message)
+    }
+})
+
+router.post('/reset-password/:id/:token', async (req, res, next) => {
+    const {id, token} = req.params
+    const {password, password2} = req.body
+    
+    const isUser = await checkUserExistance('id', id)
+
+    if(!isUser){
+        next(ApiError.badRequest('Id not valid'))
+        return
+    }
+
+    const secret = process.env.SECRET_KEY + id
+
+    try {
+        const payload = jwt.verify(token, secret)
+        
+        if(password !== password2){
+            next(ApiError.badRequest('Passwords must match'))
+            return
+        }
+
+        if(password.length < 6){
+            //next(ApiError.badRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
+            //return
+        }
+        
+        const email = await getUserEmail('id', id)
+        
+        const userInfo = {
+            email,
+            newPassword: password
+        }
+
+        const passwordReset = await userController.updatePassword(userInfo, next)
+
+        if(passwordReset){
+            res.send({passwordReset})
+        }
+    } catch (error) {
+        console.log(error.message)
+        res.send(error.message)
     }
 })
 
