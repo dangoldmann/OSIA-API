@@ -15,6 +15,20 @@ async function checkUserExistance(field, value)
     return result.length != 0
 }
 
+async function getUserId(field, value){
+    let sql = `select id from user where ${field} = '${value}'`
+    let [result, _] = await db.execute(sql)
+
+    return result[0].id
+}
+
+async function getUserEmail(field, value){
+    let sql = `select email from user where ${field} = '${value}'`
+    let [result, _] = await db.execute(sql)
+    
+    return result[0].email
+}
+
 async function getBodyPartId(name)
 {
     let sql = `select id from body_part where name = '${name}'`
@@ -32,4 +46,4 @@ async function checkImageExistance(imageRoute)
     return result.length != 0
 }
 
-module.exports = {validateEmail, checkUserExistance, getBodyPartId, checkImageExistance}
+module.exports = {validateEmail, checkUserExistance, getBodyPartId, checkImageExistance, getUserId, getUserEmail}
