@@ -3,13 +3,13 @@ const express = require('express')
 const app = express();
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
+const bodyParser = require('body-parser')
 const apiErrorHandler = require('./error/api-error-handler');
 const ApiError = require('./error/ApiError');
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users')
 const {router: radiographyRoutes, basePath: radiographyBasePath} = require('./routes/radiographies')
 const {router: cookiesTestRoutes, basePath: cookiesTestBasePath} = require('./test/cookiesTest')
 const {router: passwordResetTestRoutes, basePath: passwordResetTestBasePath} = require('./test/passwordResetTest')
-
 
 // middleware
 app.use(express.json())
@@ -18,6 +18,9 @@ app.use(cors({
     credentials: true
 }))
 app.use(cookieParser())
+app.use(bodyParser.urlencoded({extended: false}))
+
+app.set('view engine', 'ejs')
 
 //routes
 app.use(userBasePath, userRoutes)
