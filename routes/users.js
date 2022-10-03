@@ -36,7 +36,7 @@ router.post('/register', [
 
         res.cookie('token', token, {
             httpOnly: true,
-            maxAge: 86400,
+            maxAge: 1000 * 60 * 60 * 24 * 7,
             sameSite: 'none',
             secure: true
         })
@@ -70,7 +70,7 @@ router.post('/login', [
 
         res.cookie('token', token, {
             httpOnly: true,
-            maxAge: 86400,
+            maxAge: 1000 * 60 * 60 * 24 * 7,
             sameSite: 'none',
             secure: true
         })
