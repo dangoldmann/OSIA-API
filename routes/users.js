@@ -3,7 +3,7 @@ const userController = require('../controllers/user_Controller')
 const Redirect = require('../Redirect')
 const ApiError = require('../error/ApiError')
 const jwt = require('jsonwebtoken')
-const {body, validationResult, check} = require('express-validator')
+const {body, validationResult} = require('express-validator')
 const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
 const {sendResetPasswordEmail} = require('../controllers/email_Controller')
 
@@ -11,6 +11,13 @@ const basePath = '/users'
 
 //const apiBaseUrl = 'http://localhost:3000'
 const apiBaseUrl = 'https://osia-api-production.up.railway.app'
+
+const cookieOptions = {
+    httpOnly: true,
+    maxAge: 1000 * 60 * 60 * 24 * 7,
+    sameSite: 'none',
+    secure: true
+}
 
 router.get('/register', (req, res) => {
     if(req.cookies.access_token){
@@ -49,12 +56,7 @@ router.post('/register', [
     if(user){
         const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
-        res.cookie('access_token', token, {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: 'none',
-            secure: true
-        })
+        res.cookie('access_token', token, cookieOptions)
         .status(201)
         .send({
             user,
@@ -83,12 +85,7 @@ router.post('/login', [
     if(user) {
         const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
-        res.cookie('access_token', token, {
-            httpOnly: true,
-            maxAge: 1000 * 60 * 60 * 24 * 7,
-            sameSite: 'none',
-            secure: true
-        })
+        res.cookie('access_token', token, cookieOptions)
         .send({
             user,
             token        
@@ -98,7 +95,7 @@ router.post('/login', [
 
 router.get('/all', async (req, res) => {
     const users = await userController.getAll()
-    res.send({body: {users}})
+    res.send({users})
 })
 
 router.post('/forgot-password', async (req, res, next) => {

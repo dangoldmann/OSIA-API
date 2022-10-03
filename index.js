@@ -4,12 +4,12 @@ const app = express();
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const apiErrorHandler = require('./error/api-error-handler');
+const Redirect = require('./Redirect');
 const ApiError = require('./error/ApiError');
+const apiErrorHandler = require('./error/api-error-handler');
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users')
 const {router: radiographyRoutes, basePath: radiographyBasePath} = require('./routes/radiographies')
 const {router: cookiesTestRoutes, basePath: cookiesTestBasePath} = require('./test/cookiesTest');
-const Redirect = require('./Redirect');
 
 // middleware
 app.use(express.json())
