@@ -24,9 +24,8 @@ app.set('view engine', 'ejs')
 
 //routes
 app.get('/', (req, res) => {
-    if(req.get('origin') == 'http://127.0.0.1:5500' && !req.cookies.access_token){
-        res.send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
-        return
+    if(!req.cookies.access_token){  
+        return res.send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
     }
 })  
 

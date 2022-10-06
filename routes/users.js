@@ -4,11 +4,10 @@ const Redirect = require('../redirect/Redirect')
 const ApiError = require('../error/ApiError')
 const jwt = require('jsonwebtoken')
 const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
-const {sendResetPasswordEmail} = require('../controllers/email_Controller')
+const {sendResetPasswordEmail} = require('../email/emailSender')
 const {signUpSchema, logInSchema} = require('../validators/validators')
 const {validator} = require('../middleware/validator.middleware')
 const {isLoggedIn} = require('../middleware/cookies.middleware')
-const { cookie } = require('express-validator')
 
 const basePath = '/users'
 
