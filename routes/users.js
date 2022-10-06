@@ -8,6 +8,7 @@ const {sendResetPasswordEmail} = require('../controllers/email_Controller')
 const {signUpSchema, logInSchema} = require('../validators/validators')
 const {validator} = require('../middleware/validator.middleware')
 const {isLoggedIn} = require('../middleware/cookies.middleware')
+const { cookie } = require('express-validator')
 
 const basePath = '/users'
 
@@ -26,8 +27,8 @@ router.get('/register', isLoggedIn)
 router.get('/login', isLoggedIn)
 
 router.get('/logout', async (req, res) => {
-    res.cookie('access_token', 'hola', cookieOptions)
-    //res.send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
+    res.clearCookie('access_token', {sameSite: 'none', secure: true})
+    .send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
 })
 
 router.post('/register', signUpSchema, validator, async (req, res, next) => {
