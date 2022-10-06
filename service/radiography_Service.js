@@ -1,4 +1,4 @@
-const db = require('../db/db')
+const db = require('../db/database')
 const {checkUserExistance, getBodyPartId, checkImageExistance} = require('../scripts/dbFunctions')
 const ApiError = require('../error/ApiError')
 

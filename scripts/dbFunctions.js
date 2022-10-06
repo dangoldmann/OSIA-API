@@ -1,4 +1,4 @@
-const db = require('../db/db')
+const db = require('../db/database')
 
 async function validateEmail(email){
     let sql = `select * from user where email = '${email}'`
