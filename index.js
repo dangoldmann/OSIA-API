@@ -4,7 +4,7 @@ const app = express();
 const cors = require('cors')
 const cookieParser = require('cookie-parser')
 const bodyParser = require('body-parser')
-const Redirect = require('./Redirect');
+const Redirect = require('./redirect/Redirect');
 const ApiError = require('./error/ApiError');
 const apiErrorHandler = require('./error/api-error-handler');
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users')
@@ -28,7 +28,7 @@ app.get('/', (req, res) => {
         res.send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
         return
     }
-})
+})  
 
 app.use(userBasePath, userRoutes)
 app.use(radiographyBasePath, radiographyRoutes)
