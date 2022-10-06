@@ -3,9 +3,10 @@ const userController = require('../controllers/user_Controller')
 const Redirect = require('../Redirect')
 const ApiError = require('../error/ApiError')
 const jwt = require('jsonwebtoken')
-const {body, validationResult} = require('express-validator')
 const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
 const {sendResetPasswordEmail} = require('../controllers/email_Controller')
+const {signUpSchema, logInSchema} = require('../validators/validators')
+const {validator} = require('../middleware/validator.middleware')
 
 const basePath = '/users'
 
@@ -33,20 +34,7 @@ router.get('/login', (req, res) => {
     }
 })
 
-router.post('/register', [
-    body('name', 'Ingrese un nombre completo').isLength({min: 3}),
-    body('surname', 'Ingrese un apellido completo').isLength({min: 4}),
-    body('email', 'Ingrese un email valido').isEmail(),
-    body('phone', 'Ingres un número de telefono válido').isMobilePhone(),
-    //body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
-],  async (req, res, next) => {
-    const errors = validationResult(req)
-    
-    if(!errors.isEmpty()){
-        next(ApiError.badRequest(errors.array()))
-        return
-    }
-    
+router.post('/register', signUpSchema, validator, async (req, res, next) => {
     const {name, surname, email, phone, password} = req.body
 
     const userInfo = {name, surname, email, phone, password}
@@ -65,17 +53,7 @@ router.post('/register', [
     }
 })
 
-router.post('/login', [
-    body('email', 'Ingrese un email valido').isEmail(),
-    //body('password', 'La contraseña debe de ser como mínimo de 6 caracteres').isLength({min: 6})
-], async (req, res, next) => {
-    const errors = validationResult(req)
-
-    if(!errors.isEmpty()){
-        next(ApiError.badRequest(errors.array()))
-        return
-    }
-    
+router.post('/login', logInSchema, validator, async (req, res, next) => {
     const {email, password} = req.body
 
     const userInfo = {email, password}
