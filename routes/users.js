@@ -1,12 +1,13 @@
 const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
-const Redirect = require('../Redirect')
+const Redirect = require('../redirect/Redirect')
 const ApiError = require('../error/ApiError')
 const jwt = require('jsonwebtoken')
 const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
 const {sendResetPasswordEmail} = require('../controllers/email_Controller')
 const {signUpSchema, logInSchema} = require('../validators/validators')
 const {validator} = require('../middleware/validator.middleware')
+const {isLoggedIn} = require('../middleware/cookies.middleware')
 
 const basePath = '/users'
 
@@ -20,18 +21,13 @@ const cookieOptions = {
     secure: true
 }
 
-router.get('/register', (req, res) => {
-    if(req.cookies.access_token){
-        res.send({redirect: new Redirect('./HomePage.html', 'You are already logged in')})
-        return
-    }
-})
+router.get('/register', isLoggedIn)
 
-router.get('/login', (req, res) => {
-    if(req.cookies.access_token){
-        res.send({redirect: new Redirect('./HomePage.html', 'You are already logged in')})
-        return
-    }
+router.get('/login', isLoggedIn)
+
+router.get('/logout', async (req, res) => {
+    res.cookie('access_token', 'hola', cookieOptions)
+    //res.send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
 })
 
 router.post('/register', signUpSchema, validator, async (req, res, next) => {
@@ -72,6 +68,9 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
 })
 
 router.get('/all', async (req, res) => {
+    if(req.get('origin') !== 'http://127.0.0.1:5500'){
+      return res.sendStatus(403)  
+    }
     const users = await userController.getAll()
     res.send({users})
 })
