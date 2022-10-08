@@ -10,6 +10,7 @@ const apiErrorHandler = require('./error/api-error-handler');
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users')
 const {router: radiographyRoutes, basePath: radiographyBasePath} = require('./routes/radiographies')
 const {router: cookiesTestRoutes, basePath: cookiesTestBasePath} = require('./test/cookiesTest');
+const {router: imagesTestRoutes, basePath: imagesTestBasePath} = require('./test/uploadImages');
 
 // middleware
 app.use(express.json())
@@ -32,6 +33,7 @@ app.get('/', (req, res) => {
 app.use(userBasePath, userRoutes)
 app.use(radiographyBasePath, radiographyRoutes)
 app.use(cookiesTestBasePath, cookiesTestRoutes)
+app.use(imagesTestBasePath, imagesTestRoutes)
 
 app.use((req, res, next) => {
     console.log(req.path)
