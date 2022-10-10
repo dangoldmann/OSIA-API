@@ -1,5 +1,6 @@
 const path = require('path')
 const multer = require('multer')
+const {ApiError} = require('../classes')
 
 const storage = multer.diskStorage({
     destination: path.join(__dirname, '../public/images'),
@@ -14,8 +15,12 @@ const upload = multer({
     dest: 'public/images',
     limits: {fileSize: 5000000},
     fileFilter: (req, file, cb) => {
-        if(file.mimetype == 'image/png' || file.mimetype == 'image/jpg' || file.mimetype == 'image/jpeg') return cb(null, true)
-        return cb(new Error('El archivo debe ser .png, .jgp o .jpeg'))
+        const fileTypes = /jpeg|jpg|png/
+        const mimetype = fileTypes.test(file.mimetype)
+        const extname = fileTypes.test(path.extname(file.originalname))
+
+        if(mimetype && extname) return cb(null, true)
+        cb(ApiError.badRequest('El archivo debe ser una imagen valida'))
     }
 }).single('image')
 
