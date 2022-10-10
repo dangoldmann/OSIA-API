@@ -12,12 +12,8 @@ const sendResetPasswordEmail = (email, link) => {
                 link
             }
         })
-        .then(() => {
-            console.log('Email sent')
-        })
-        .catch((err) => {
-            console.log(err)
-        })
+        .then(() => console.log('Email sent'))
+        .catch(err => console.log(err))
 }
 
 module.exports = {sendResetPasswordEmail}

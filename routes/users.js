@@ -67,9 +67,8 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
 })
 
 router.get('/all', async (req, res) => {
-    if(req.get('origin') !== 'http://127.0.0.1:5500'){
-      return res.sendStatus(403)  
-    }
+    if(req.get('origin') !== 'http://127.0.0.1:5500') return res.sendStatus(403) 
+
     const users = await userController.getAll()
     res.send({users})
 })
@@ -80,10 +79,7 @@ router.post('/forgot-password', async (req, res, next) => {
     // Check the email to the cookie
     const isUser = await checkUserExistance('email', email)
     
-    if(!isUser){
-        next(ApiError.badRequest('No hay ninguna cuenta asociada con este mail'))
-        return
-    }
+    if(!isUser) return next(ApiError.badRequest('No hay ninguna cuenta asociada con este mail'))
 
     const id = await getUserId('email', email)
 
@@ -107,10 +103,7 @@ router.get('/reset-password/:id/:token', async (req, res, next) => {
     
     const isUser = await checkUserExistance('id', id)
 
-    if(!isUser){
-        next(ApiError.badRequest('Id not valid'))
-        return
-    }
+    if(!isUser) return next(ApiError.badRequest('Id not valid'))
 
     const secret = process.env.SECRET_KEY + id
 
@@ -129,20 +122,14 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
     
     const isUser = await checkUserExistance('id', id)
 
-    if(!isUser){
-        next(ApiError.badRequest('Id not valid'))
-        return
-    }
+    if(!isUser) return next(ApiError.badRequest('Id not valid'))
 
     const secret = process.env.SECRET_KEY + id
 
     try {
         const payload = jwt.verify(token, secret)
         
-        if(password !== password2){
-            next(ApiError.badRequest('Passwords must match'))
-            return
-        }
+        if(password !== password2) return next(ApiError.badRequest('Passwords must match'))
 
         if(password.length < 6){
             //next(ApiError.badRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
@@ -158,9 +145,7 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
 
         const passwordReset = await userController.updatePassword(userInfo, next)
 
-        if(passwordReset){
-            res.send({passwordReset})
-        }
+        if(passwordReset) res.send({passwordReset})
     } catch (error) {
         console.log(error.message)
         res.send(error.message)
@@ -170,18 +155,12 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
 router.delete('', async (req, res, next) => {
     const {email} = req.body
     
-    if(!email){
-        next(ApiError.badRequest('You must complete all the fields'))
-        return
-    }
+    if(!email) return next(ApiError.badRequest('You must complete all the fields'))
     
     userInfo = {email}
     const isDeleted = await userController.delete(userInfo, next)
     
-    if(isDeleted)
-    {
-        res.send({isDeleted})
-    }
+    if(isDeleted) res.send({isDeleted})
 })
 
 module.exports = {router, basePath}

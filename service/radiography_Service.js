@@ -9,17 +9,11 @@ class radiographyService {
             
             const isUser = await checkUserExistance('id', userId)
             
-            if(!isUser) {
-                next(ApiError.badRequest('User not found'))
-                return
-            }
+            if(!isUser) return next(ApiError.badRequest('User not found'))
 
             const bodyPartId = await getBodyPartId(bodyPart)
             
-            if(bodyPartId == -1) {
-                next(ApiError.badRequest('Body part not valid'))
-                return
-            }
+            if(bodyPartId == -1) return next(ApiError.badRequest('Body part not valid'))
             
             let sql = `insert into radiography (image_route, id_body_part, id_user) values ('${imageRoute}', ${bodyPartId}, ${userId})`
             await db.execute(sql)
@@ -43,10 +37,7 @@ class radiographyService {
 
             const isUser = await checkUserExistance('id', userId)
             
-            if(!isUser) {
-                next(ApiError.badRequest('User not found'))
-                return
-            }
+            if(!isUser) return next(ApiError.badRequest('User not found'))
 
             let sql = `select image_route from radiography where id_user = ${userId}`
             var [imageRoutes, _] = await db.execute(sql)
@@ -63,10 +54,7 @@ class radiographyService {
             const {imageRoute} = radiographyInfo
 
             const isImage = await checkImageExistance(imageRoute)
-            if(!isImage) {
-                next(ApiError.badRequest('Image not found'))
-                return
-            }
+            if(!isImage) return next(ApiError.badRequest('Image not found'))
 
             let sql = `delete from radiography where image_route = '${imageRoute}'`
             await db.execute(sql)

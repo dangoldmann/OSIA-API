@@ -17,10 +17,7 @@ class userService {
             const hashedPassword = bcrypt.hashSync(password, 10)
 
             const isEmailValid = await validateEmail(email)
-            if(!isEmailValid) {
-                next(ApiError.badRequest('User already exists with that email adress'))
-                return 
-            }
+            if(!isEmailValid) return next(ApiError.badRequest('User already exists with that email adress'))
        
             let sql = `insert into user (name, surname, email, phone, password) values ('${name}', '${surname}', '${email}', '${phone}', '${hashedPassword}')`
             await db.execute(sql)
@@ -45,15 +42,9 @@ class userService {
             const [result, _] = await db.execute(sql)
             const user = result[0]
 
-            if(!user) {
-                next(ApiError.badRequest('User not found'))
-                return
-            }
+            if(!user) return next(ApiError.badRequest('User not found'))
             
-            if(!bcrypt.compareSync(password, user.password)) {
-                next(ApiError.badRequest('Invalid password'))
-                return
-            }
+            if(!bcrypt.compareSync(password, user.password)) return next(ApiError.badRequest('Invalid password'))
 
             return user
         }
@@ -69,10 +60,7 @@ class userService {
             const {email, newPassword} = userInfo
 
             const isUser = await checkUserExistance('email', email)
-            if(!isUser) {
-                next(ApiError.badRequest('User not found'))
-                return
-            }
+            if(!isUser) return next(ApiError.badRequest('User not found'))
 
             const hashedNewPassword = bcrypt.hashSync(newPassword, 10)
 
@@ -91,10 +79,7 @@ class userService {
             const {email} = userInfo
 
             const isUser = await checkUserExistance('email', email)
-            if(!isUser) {
-                next(ApiError.badRequest('User not found'))
-                return
-            }
+            if(!isUser) return next(ApiError.badRequest('User not found'))
 
             let sql = `delete from user where email = '${email}'`
             await db.execute(sql)
