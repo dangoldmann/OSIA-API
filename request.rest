@@ -34,7 +34,7 @@ Content-Type: application/json
 }
 
 ### agregar una radiografia
-POST {{baseUrl}}/radiographies/add
+POST {{baseUrl}}/radiographies/upload
 Content-Type: application/json
 
 {
