@@ -15,7 +15,7 @@ const cookieJwtAuth = (req, res, next) => {
     }
     catch (err) {
         res.clearCookie('access_token')
-        return next(ApiError.badRequest(err.message))
+        return next(new ApiError(401, err.message))
     }
 }
 
