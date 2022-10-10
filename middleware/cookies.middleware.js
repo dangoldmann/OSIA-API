@@ -1,4 +1,4 @@
-const Redirect = require('../redirect/Redirect')
+const Redirect = require('../classes/Redirect')
 
 const isLoggedIn = (req, res, next) => {
     if(req.cookies.access_token) {

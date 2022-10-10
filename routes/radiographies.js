@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const radiographyController = require('../controllers/radiography_Controller')
-const ApiError = require('../error/ApiError')
+const ApiError = require('../classes/ApiError')
 
 const basePath = '/radiographies'
 

@@ -1,4 +1,4 @@
-const ApiError = require('./ApiError')
+const ApiError = require('../classes/ApiError')
 
 function apiErrorHandler(err, req, res, next){
     //console.log(err)

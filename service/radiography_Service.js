@@ -1,6 +1,6 @@
 const db = require('../db/database')
 const {checkUserExistance, getBodyPartId, checkImageExistance} = require('../scripts/dbFunctions')
-const ApiError = require('../error/ApiError')
+const ApiError = require('../classes/ApiError')
 
 class radiographyService {
     async create(radiographyInfo, next) {

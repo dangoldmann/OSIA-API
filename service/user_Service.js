@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 const db = require('../db/database')
 const {validateEmail, checkUserExistance} = require('../scripts/dbFunctions')
-const ApiError = require('../error/ApiError')
+const ApiError = require('../classes/ApiError')
 
 class userService {
     async getAll() {

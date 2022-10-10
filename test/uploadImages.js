@@ -1,5 +1,5 @@
 const router = require('express').Router()
-const ApiError = require('../error/ApiError')
+const ApiError = require('../classes/ApiError')
 const {upload} = require('../middleware/multer.middleware')
 
 const basePath = '/images'
