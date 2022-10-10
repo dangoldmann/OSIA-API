@@ -25,13 +25,9 @@ class userService {
             let sql = `insert into user (name, surname, email, phone, password) values ('${name}', '${surname}', '${email}', '${phone}', '${hashedPassword}')`
             await db.execute(sql)
 
-            const newUser = {
-                name,
-                surname,
-                email,
-                phone,
-                password: hashedPassword
-            }
+            sql = `select * from user where email = '${email}'`
+            const [result, _] = await db.execute(sql)
+            const newUser = result[0]
 
             return newUser
         }

@@ -1,12 +1,15 @@
 const path = require('path')
 const multer = require('multer')
+const jwt = require('jsonwebtoken')
 const {ApiError} = require('../classes')
 const fs = require('fs-extra')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const userId = 1
-        const path = `./public/images/${userId}`
+        const access_token = req.cookies.access_token
+        const user = jwt.verify(access_token, process.env.SECRET_KEY).user
+        
+        const path = `./public/images/${user.id}`
         fs.mkdirsSync(path)
         cb(null, path)
     },
