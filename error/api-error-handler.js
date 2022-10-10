@@ -12,7 +12,11 @@ function apiErrorHandler(err, req, res, next){
         return
     }
 
-    res.status(500).json('Something went wrong')
+    res.status(500).json({
+        error: {
+            message: err.message
+        }
+    })
 }
 
 module.exports = apiErrorHandler
