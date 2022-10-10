@@ -6,10 +6,7 @@ const fs = require('fs-extra')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const access_token = req.cookies.access_token
-        const user = jwt.verify(access_token, process.env.SECRET_KEY).user
-        
-        const path = `./public/images/${user.id}`
+        const path = `./public/images/${req.user.id}`
         fs.mkdirsSync(path)
         cb(null, path)
     },
@@ -31,7 +28,5 @@ const upload = multer({
         cb(ApiError.badRequest('El archivo debe ser una imagen valida'))
     }
 }).single('image')
-
-
 
 module.exports = {upload}

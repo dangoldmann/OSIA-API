@@ -3,20 +3,18 @@ const radiographyController = require('../controllers/radiography_Controller')
 const jwt = require('jsonwebtoken')
 const ApiError = require('../classes/ApiError')
 const {upload} = require('../middleware/multer.middleware')
+const {cookieJwtAuth} = require('../middleware/cookies.middleware')
 
 const basePath = '/radiographies'
 
-router.post('/upload', async (req, res, next) => {
+router.post('/upload', cookieJwtAuth, async (req, res, next) => {
     upload(req, res, err => {
         if(err) next(ApiError.badRequest(err.message))
     })
+    
+    const imageRoute = `./public/images/${req.user.id}`
 
-    const access_token = req.cookies.access_token
-    const user = jwt.verify(access_token, process.env.SECRET_KEY).user
-
-    const imageRoute = `./public/images/${user.id}`
-
-    const radiographyInfo = {imageRoute, bodyPart: 'Brazo', userId: user.id}
+    const radiographyInfo = {imageRoute, bodyPart: 'Brazo', userId: req.user.id}
 
     const radiography = await radiographyController.create(radiographyInfo, next)
 
@@ -26,35 +24,25 @@ router.post('/upload', async (req, res, next) => {
 router.get('', async (req, res, next) => {
     const {userId} = req.body
     
-    if(!userId){
-        next(ApiError.badRequest('You must complete all the fields'))
-        return
-    }
+    if(!userId) return next(ApiError.badRequest('You must complete all the fields'))
     
     const userInfo = {userId}
 
     const imageRoutes = await radiographyController.getByUserId(userInfo, next)
 
-    if(imageRoutes){
-        res.send({imageRoutes})
-    }
+    if(imageRoutes) res.send({imageRoutes})
 })
 
 router.delete('/delete', async (req, res, next) => {
     const {imageRoute} = req.body
 
-    if(!imageRoute){
-        next(ApiError.badRequest('You must complete all the fields'))
-        return
-    }
+    if(!imageRoute) return next(ApiError.badRequest('You must complete all the fields'))
 
     const radiographyInfo = {imageRoute}
 
     const isDeleted = await radiographyController.delete(radiographyInfo, next)
 
-    if(isDeleted){
-        res.send({isDeleted})
-    }
+    if(isDeleted) res.send({isDeleted})
 })
 
 module.exports = { router, basePath }
