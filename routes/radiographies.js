@@ -12,9 +12,9 @@ router.post('/upload', cookieJwtAuth, async (req, res, next) => {
         if(err) next(ApiError.badRequest(err.message))
     })
     
-    const imageRoute = `./public/images/${req.user.id}`
+    const imageRoute = `./public/images/${req.userId}`
 
-    const radiographyInfo = {imageRoute, bodyPart: 'Brazo', userId: req.user.id}
+    const radiographyInfo = {imageRoute, bodyPart: 'Brazo', userId: req.userId}
 
     const radiography = await radiographyController.create(radiographyInfo, next)
 

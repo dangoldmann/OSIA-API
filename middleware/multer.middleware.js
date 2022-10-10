@@ -6,7 +6,7 @@ const fs = require('fs-extra')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const path = `./public/images/${req.user.id}`
+        const path = `./public/images/${req.userId}`
         fs.mkdirsSync(path)
         cb(null, path)
     },

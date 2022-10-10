@@ -9,9 +9,9 @@ const cookieJwtAuth = (req, res, next) => {
     const access_token = req.cookies.access_token
     
     try {
-        const user = jwt.verify(access_token, process.env.SECRET_KEY).user
-        req.user = user
-        next()
+        const userId = jwt.verify(access_token, process.env.SECRET_KEY).id
+        req.userId = userId
+        return next()
     }
     catch (err) {
         res.clearCookie('access_token')

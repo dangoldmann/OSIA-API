@@ -37,7 +37,7 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
     const user = await userController.create(userInfo, next)
     
     if(user){
-        const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
+        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
         res.cookie('access_token', token, cookieOptions)
         .status(201)
@@ -56,7 +56,7 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
     const user = await userController.login(userInfo, next)
 
     if(user) {
-        const token = jwt.sign({user}, process.env.SECRET_KEY, {expiresIn: '24h'})
+        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '24h'})
 
         res.cookie('access_token', token, cookieOptions)
         .send({
@@ -84,13 +84,8 @@ router.post('/forgot-password', async (req, res, next) => {
     const id = await getUserId('email', email)
 
     const secret = process.env.SECRET_KEY + id
-    
-    const payload = {
-        id,
-        email
-    }
 
-    const token = jwt.sign(payload, secret, {expiresIn: '3h'})
+    const token = jwt.sign({id}, secret, {expiresIn: '3h'})
     const link = `${apiBaseUrl}/users/reset-password/${id}/${token}`
     
     sendResetPasswordEmail(email, link)
