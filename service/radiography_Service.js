@@ -1,5 +1,5 @@
 const db = require('../db/database')
-const {checkUserExistance, getBodyPartId, checkImageExistance} = require('../scripts/dbFunctions')
+const {checkUserExistance, getBodyPartId, checkImageExistance} = require('../utils/dbFunctions')
 const createError = require('http-errors')
 
 class radiographyService {

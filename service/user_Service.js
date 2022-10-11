@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt')
 const db = require('../db/database')
-const {validateEmail, checkUserExistance} = require('../scripts/dbFunctions')
+const {validateEmail, checkUserExistance} = require('../utils/dbFunctions')
 const createError = require('http-errors')
 
 class userService {
