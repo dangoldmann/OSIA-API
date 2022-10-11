@@ -1,7 +1,6 @@
 const router = require('express').Router()
 const radiographyController = require('../controllers/radiography_Controller')
-const jwt = require('jsonwebtoken')
-const ApiError = require('../classes/ApiError')
+const createError = require('http-errors')
 const {upload} = require('../middleware/multer.middleware')
 const {cookieJwtAuth} = require('../middleware/cookies.middleware')
 
@@ -9,7 +8,7 @@ const basePath = '/radiographies'
 
 router.post('/upload', cookieJwtAuth, async (req, res, next) => {
     upload(req, res, err => {
-        if(err) next(ApiError.badRequest(err.message))
+        if(err) next(createError.BadRequest(err.message))
     })
     
     const imageRoute = `./public/images/${req.userId}`
@@ -24,7 +23,7 @@ router.post('/upload', cookieJwtAuth, async (req, res, next) => {
 router.get('', async (req, res, next) => {
     const {userId} = req.body
     
-    if(!userId) return next(ApiError.badRequest('You must complete all the fields'))
+    if(!userId) return next(createError.BadRequest('You must complete all the fields'))
     
     const userInfo = {userId}
 
@@ -36,7 +35,7 @@ router.get('', async (req, res, next) => {
 router.delete('/delete', async (req, res, next) => {
     const {imageRoute} = req.body
 
-    if(!imageRoute) return next(ApiError.badRequest('You must complete all the fields'))
+    if(!imageRoute) return next(createError.BadRequest('You must complete all the fields'))
 
     const radiographyInfo = {imageRoute}
 

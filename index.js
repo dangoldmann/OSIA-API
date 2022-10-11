@@ -4,8 +4,9 @@ const app = express();
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const {ApiError, Redirect} = require('./classes');
-const apiErrorHandler = require('./middleware/apiError.middleware');
+const {Redirect} = require('./classes');
+const createError = require('http-errors')
+const errorHandler = require('./middleware/error.middleware');
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users');
 const {router: radiographyRoutes, basePath: radiographyBasePath} = require('./routes/radiographies');
 const {router: cookiesTestRoutes, basePath: cookiesTestBasePath} = require('./test/cookiesTest');
@@ -36,12 +37,11 @@ app.use(cookiesTestBasePath, cookiesTestRoutes)
 app.use(imagesTestBasePath, imagesTestRoutes)
 app.use((req, res, next) => {
     console.log(req.path)
-    const error = new ApiError(404, 'Not found')
-    next(error)
+    next(createError.NotFound())
 })
 
 // ERROR HANDLING
-app.use(apiErrorHandler)
+app.use(errorHandler)
 
 // STARTING THE SERVER
 app.listen(process.env.PORT, () => console.log(`Listening on port ${process.env.PORT}...`))

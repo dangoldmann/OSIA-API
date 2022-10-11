@@ -1,6 +1,6 @@
 const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
-const {ApiError, Redirect} = require('../classes')
+const {Redirect} = require('../classes')
 const createError = require('http-errors')
 const jwt = require('jsonwebtoken')
 const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
@@ -67,7 +67,7 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
     }
 })
 
-router.get('/all', async (req, res, next) => {
+router.get('/all', async (req, res) => {
     if(req.get('origin') !== 'http://127.0.0.1:5500') return res.sendStatus(403) 
     
     const users = await userController.getAll()
@@ -80,7 +80,7 @@ router.post('/forgot-password', async (req, res, next) => {
     // Check the email to the cookie
     const isUser = await checkUserExistance('email', email)
     
-    if(!isUser) return next(ApiError.badRequest('No hay ninguna cuenta asociada con este mail'))
+    if(!isUser) return next(createError.BadRequest('No hay ninguna cuenta asociada con este mail'))
 
     const id = await getUserId('email', email)
 
@@ -99,7 +99,7 @@ router.get('/reset-password/:id/:token', async (req, res, next) => {
     
     const isUser = await checkUserExistance('id', id)
 
-    if(!isUser) return next(ApiError.badRequest('Id not valid'))
+    if(!isUser) return next(createError.BadRequest('Id not valid'))
 
     const secret = process.env.ACCESS_TOKEN_SECRET + id
 
@@ -118,17 +118,17 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
     
     const isUser = await checkUserExistance('id', id)
 
-    if(!isUser) return next(ApiError.badRequest('Id not valid'))
+    if(!isUser) return next(createError.BadRequest('Id not valid'))
 
     const secret = process.env.ACCESS_TOKEN_SECRET + id
 
     try {
         const payload = jwt.verify(token, secret)
         
-        if(password !== password2) return next(ApiError.badRequest('Passwords must match'))
+        if(password !== password2) return next(createError.BadRequest('Passwords must match'))
 
         if(password.length < 6){
-            //next(ApiError.badRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
+            //next(createError.BadRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
             //return
         }
         
@@ -151,7 +151,7 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
 router.delete('', async (req, res, next) => {
     const {email} = req.body
     
-    if(!email) return next(ApiError.badRequest('You must complete all the fields'))
+    if(!email) return next(createError.BadRequest('You must complete all the fields'))
     
     userInfo = {email}
     const isDeleted = await userController.delete(userInfo, next)

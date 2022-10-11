@@ -1,4 +1,5 @@
-const {Redirect, ApiError} = require('../classes')
+const {Redirect} = require('../classes')
+const createError = require('http-errors')
 const jwt = require('jsonwebtoken')
 
 const isLoggedIn = (req, res, next) => {
@@ -15,7 +16,7 @@ const cookieJwtAuth = (req, res, next) => {
     }
     catch (err) {
         res.clearCookie('access_token')
-        return next(new ApiError(401, err.message))
+        return next(createError.Unauthorized(err.message))
     }
 }
 

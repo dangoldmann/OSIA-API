@@ -1,7 +1,6 @@
 const path = require('path')
 const multer = require('multer')
-const jwt = require('jsonwebtoken')
-const {ApiError} = require('../classes')
+const createError = require('http-errors')
 const fs = require('fs-extra')
 
 const storage = multer.diskStorage({
@@ -25,7 +24,7 @@ const upload = multer({
         const extname = fileTypes.test(path.extname(file.originalname))
 
         if(mimetype && extname) return cb(null, true)
-        cb(ApiError.badRequest('El archivo debe ser una imagen valida'))
+        cb(createError.BadRequest('El archivo debe ser una imagen valida'))
     }
 }).single('image')
 

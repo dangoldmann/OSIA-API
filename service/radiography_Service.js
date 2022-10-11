@@ -1,6 +1,6 @@
 const db = require('../db/database')
 const {checkUserExistance, getBodyPartId, checkImageExistance} = require('../scripts/dbFunctions')
-const ApiError = require('../classes/ApiError')
+const createError = require('http-errors')
 
 class radiographyService {
     async create(radiographyInfo, next) {
@@ -9,11 +9,11 @@ class radiographyService {
             
             const isUser = await checkUserExistance('id', userId)
             
-            if(!isUser) return next(ApiError.badRequest('User not found'))
+            if(!isUser) return next(createError.BadRequest('User not found'))
 
             const bodyPartId = await getBodyPartId(bodyPart)
             
-            if(bodyPartId == -1) return next(ApiError.badRequest('Body part not valid'))
+            if(bodyPartId == -1) return next(createError.BadRequest('Body part not valid'))
             
             let sql = `insert into radiography (image_route, id_body_part, id_user) values ('${imageRoute}', ${bodyPartId}, ${userId})`
             await db.execute(sql)
@@ -37,7 +37,7 @@ class radiographyService {
 
             const isUser = await checkUserExistance('id', userId)
             
-            if(!isUser) return next(ApiError.badRequest('User not found'))
+            if(!isUser) return next(createError.BadRequest('User not found'))
 
             let sql = `select image_route from radiography where id_user = ${userId}`
             var [imageRoutes, _] = await db.execute(sql)
@@ -54,7 +54,7 @@ class radiographyService {
             const {imageRoute} = radiographyInfo
 
             const isImage = await checkImageExistance(imageRoute)
-            if(!isImage) return next(ApiError.badRequest('Image not found'))
+            if(!isImage) return next(createError.BadRequest('Image not found'))
 
             let sql = `delete from radiography where image_route = '${imageRoute}'`
             await db.execute(sql)
