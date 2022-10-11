@@ -1,38 +1,35 @@
-const createError = require('http-errors')
-const jwt = require('jsonwebtoken')
+const {verifyAccessToken} = require('../helpers/jwtHelper')
 
 const isLoggedIn = (req, res, next) => {
     const access_token = req.cookies.access_token
 
-    try {
-        jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET)
-        return res.send({
-            redirect: {
-                destination: './HomePage.html',
-                reason: 'You are already logged in'
-            }
-        })    
-    } catch (error) {
+    const payload = verifyAccessToken(access_token)
+    
+    if(payload.message) {
         res.clearCookie('access_token', {sameSite: 'none', secure: true})
         return next()
     }
+
+    return res.send({
+        redirect: {
+            destination: './HomePage.html',
+            reason: 'You are already logged in'
+        }
+    })
 }
 
 const cookieJwtAuth = (req, res, next) => {
     const access_token = req.cookies.access_token
     
-    try {
-        const userId = jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET).id
-        req.userId = userId
-        return next()
-    }
-    catch (err) {
+    const payload = verifyAccessToken(access_token)
+    
+    if(payload.message) {
         res.clearCookie('access_token', {sameSite: 'none', secure: true})
         
         return res.status(401).send({
             error: {
                 status: 401,
-                message: err.message
+                message: payload.message
             },
             redirect: {
                 destination: './LogIn.html',
@@ -40,6 +37,10 @@ const cookieJwtAuth = (req, res, next) => {
             }
         })
     }
+    
+    const userId = payload.id
+    req.userId = userId
+    return next()
 }
 
 module.exports = {isLoggedIn, cookieJwtAuth}

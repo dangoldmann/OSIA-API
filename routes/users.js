@@ -2,17 +2,17 @@ const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
 const {Redirect} = require('../classes')
 const createError = require('http-errors')
-const jwt = require('jsonwebtoken')
-const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
-const {sendResetPasswordEmail} = require('../scripts/emailSender')
-const {signUpSchema, logInSchema} = require('../scripts/validators')
+const {signAccessToken, signRefreshToken, signResetPasswordToken, verifyRefreshToken, verifyResetPasswordToken} = require('../helpers/jwtHelper')
+const {checkUserExistance, getUserId, getUserEmail} = require('../utils/dbFunctions')
+const {sendResetPasswordEmail} = require('../helpers/emailSender')
+const {signUpSchema, logInSchema} = require('../helpers/validators')
 const {validator} = require('../middleware/validator.middleware')
 const {isLoggedIn} = require('../middleware/cookies.middleware')
 
 const basePath = '/users'
 
-//const apiBaseUrl = 'http://localhost:3000'
-const apiBaseUrl = 'https://osia-api-production.up.railway.app'
+const apiBaseUrl = 'http://localhost:3000'
+//const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
 const cookieOptions = {
     httpOnly: true,
@@ -21,11 +21,11 @@ const cookieOptions = {
     secure: true
 }
 
-router.get('/register', isLoggedIn)
+router.get('/register', isLoggedIn, () => {})
 
-router.get('/login', isLoggedIn)
+router.get('/login', isLoggedIn, () => {})
 
-router.get('/logout', async (req, res) => {
+router.get('/logout', (req, res) => {
     res.clearCookie('access_token', {sameSite: 'none', secure: true})
     .send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
 })
@@ -38,7 +38,7 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
     const user = await userController.create(userInfo, next)
     
     if(user){
-        const access_token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
+        const access_token = signAccessToken(user.id)
 
         res.cookie('access_token', access_token, cookieOptions)
         .status(201)
@@ -57,7 +57,7 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
     const user = await userController.login(userInfo, next)
 
     if(user) {
-        const access_token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
+        const access_token = signAccessToken(user.id)
 
         res.cookie('access_token', access_token, cookieOptions)
         .send({
@@ -84,9 +84,7 @@ router.post('/forgot-password', async (req, res, next) => {
 
     const id = await getUserId('email', email)
 
-    const secret = process.env.ACCESS_TOKEN_SECRET + id
-
-    const token = jwt.sign({id}, secret, {expiresIn: '3h'})
+    const token = signResetPasswordToken(id)
     const link = `${apiBaseUrl}/users/reset-password/${id}/${token}`
     
     sendResetPasswordEmail(email, link)
@@ -101,15 +99,14 @@ router.get('/reset-password/:id/:token', async (req, res, next) => {
 
     if(!isUser) return next(createError.BadRequest('Id not valid'))
 
-    const secret = process.env.ACCESS_TOKEN_SECRET + id
+    const payload = verifyResetPasswordToken(token, id)
 
-    try {
-        const payload = jwt.verify(token, secret)
-        res.render('../views/reset-password')
-    } catch (err) {
-        console.log(err.message)
-        next(createError.Unauthorized(err.message))
+    if(payload.message) {
+        console.log(payload.message)
+        return next(createError.Unauthorized(payload.message))
     }
+
+    res.render('../views/reset-password')
 })
 
 router.post('/reset-password/:id/:token', async (req, res, next) => {
@@ -120,32 +117,29 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
 
     if(!isUser) return next(createError.BadRequest('Id not valid'))
 
-    const secret = process.env.ACCESS_TOKEN_SECRET + id
+    const payload = verifyResetPasswordToken(token, id)
 
-    try {
-        const payload = jwt.verify(token, secret)
-        
-        if(password !== password2) return next(createError.BadRequest('Passwords must match'))
-
-        if(password.length < 6){
-            //next(createError.BadRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
-            //return
-        }
-        
-        const email = await getUserEmail('id', id)
-        
-        const userInfo = {
-            email,
-            newPassword: password
-        }
-
-        const passwordReset = await userController.updatePassword(userInfo, next)
-
-        if(passwordReset) res.send({passwordReset})
-    } catch (err) {
-        console.log(err.message)
-        next(createError.Unauthorized(err.message))
+    if(payload.message) {
+        console.log(payload.message)
+        return next(createError.Unauthorized(payload.message))
     }
+
+    if(password !== password2) return next(createError.BadRequest('Passwords must match'))
+
+    if(password.length < 6){
+        //return next(createError.BadRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
+    }
+    
+    const email = await getUserEmail('id', id)
+        
+    const userInfo = {
+        email,
+        newPassword: password
+    }
+
+    const passwordReset = await userController.updatePassword(userInfo, next)
+
+    if(passwordReset) return res.send({passwordReset})
 })
 
 router.delete('', async (req, res, next) => {
