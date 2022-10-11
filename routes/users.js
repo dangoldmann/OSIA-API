@@ -38,13 +38,13 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
     const user = await userController.create(userInfo, next)
     
     if(user){
-        const token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
+        const access_token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
 
-        res.cookie('access_token', token, cookieOptions)
+        res.cookie('access_token', access_token, cookieOptions)
         .status(201)
         .send({
             user,
-            token
+            access_token
         })
     }
 })
@@ -57,12 +57,12 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
     const user = await userController.login(userInfo, next)
 
     if(user) {
-        const token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
+        const access_token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
 
-        res.cookie('access_token', token, cookieOptions)
+        res.cookie('access_token', access_token, cookieOptions)
         .send({
             user,
-            token        
+            access_token        
         })
     }
 })
@@ -106,9 +106,9 @@ router.get('/reset-password/:id/:token', async (req, res, next) => {
     try {
         const payload = jwt.verify(token, secret)
         res.render('../views/reset-password')
-    } catch (error) {
-        console.log(error.message)
-        res.send(error.message)
+    } catch (err) {
+        console.log(err.message)
+        next(createError.Unauthorized(err.message))
     }
 })
 
@@ -142,9 +142,9 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
         const passwordReset = await userController.updatePassword(userInfo, next)
 
         if(passwordReset) res.send({passwordReset})
-    } catch (error) {
-        console.log(error.message)
-        res.send(error.message)
+    } catch (err) {
+        console.log(err.message)
+        next(createError.Unauthorized(err.message))
     }
 })
 

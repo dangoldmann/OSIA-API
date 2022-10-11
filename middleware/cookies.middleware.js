@@ -10,7 +10,7 @@ const cookieJwtAuth = (req, res, next) => {
     const access_token = req.cookies.access_token
     
     try {
-        const userId = jwt.verify(access_token, process.env.SECRET_KEY).id
+        const userId = jwt.verify(access_token, process.env.ACCESS_TOKEN_SECRET).id
         req.userId = userId
         return next()
     }
