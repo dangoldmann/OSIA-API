@@ -11,8 +11,8 @@ const {isLoggedIn} = require('../middleware/cookies.middleware')
 
 const basePath = '/users'
 
-const apiBaseUrl = 'http://localhost:3000'
-//const apiBaseUrl = 'https://osia-api-production.up.railway.app'
+//const apiBaseUrl = 'http://localhost:3000'
+const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
 const cookieOptions = {
     httpOnly: true,
