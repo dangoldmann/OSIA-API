@@ -1,6 +1,7 @@
 const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
 const {ApiError, Redirect} = require('../classes')
+const createError = require('http-errors')
 const jwt = require('jsonwebtoken')
 const {checkUserExistance, getUserId, getUserEmail} = require('../scripts/dbFunctions')
 const {sendResetPasswordEmail} = require('../scripts/emailSender')
@@ -37,7 +38,7 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
     const user = await userController.create(userInfo, next)
     
     if(user){
-        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '24h'})
+        const token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
 
         res.cookie('access_token', token, cookieOptions)
         .status(201)
@@ -56,7 +57,7 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
     const user = await userController.login(userInfo, next)
 
     if(user) {
-        const token = jwt.sign({id: user.id}, process.env.SECRET_KEY, {expiresIn: '24h'})
+        const token = jwt.sign({id: user.id}, process.env.ACCESS_TOKEN_SECRET, {expiresIn: '24h'})
 
         res.cookie('access_token', token, cookieOptions)
         .send({
@@ -66,9 +67,9 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
     }
 })
 
-router.get('/all', async (req, res) => {
+router.get('/all', async (req, res, next) => {
     if(req.get('origin') !== 'http://127.0.0.1:5500') return res.sendStatus(403) 
-
+    
     const users = await userController.getAll()
     res.send({users})
 })
@@ -83,7 +84,7 @@ router.post('/forgot-password', async (req, res, next) => {
 
     const id = await getUserId('email', email)
 
-    const secret = process.env.SECRET_KEY + id
+    const secret = process.env.ACCESS_TOKEN_SECRET + id
 
     const token = jwt.sign({id}, secret, {expiresIn: '3h'})
     const link = `${apiBaseUrl}/users/reset-password/${id}/${token}`
@@ -100,7 +101,7 @@ router.get('/reset-password/:id/:token', async (req, res, next) => {
 
     if(!isUser) return next(ApiError.badRequest('Id not valid'))
 
-    const secret = process.env.SECRET_KEY + id
+    const secret = process.env.ACCESS_TOKEN_SECRET + id
 
     try {
         const payload = jwt.verify(token, secret)
@@ -119,7 +120,7 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
 
     if(!isUser) return next(ApiError.badRequest('Id not valid'))
 
-    const secret = process.env.SECRET_KEY + id
+    const secret = process.env.ACCESS_TOKEN_SECRET + id
 
     try {
         const payload = jwt.verify(token, secret)
