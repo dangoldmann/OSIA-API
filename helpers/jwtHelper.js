@@ -1,5 +1,4 @@
 const jwt = require('jsonwebtoken')
-const createError = require('http-errors')
 
 const signAccessToken = userId => {
     const payload = {id: userId}
