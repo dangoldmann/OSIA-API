@@ -25,7 +25,7 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
 
         res.cookie('access_token', access_token, cookieOptions)
         .status(201)
-        .send()
+        .send({})
     }
 })
 

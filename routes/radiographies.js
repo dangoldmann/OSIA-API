@@ -17,7 +17,7 @@ router.post('/upload', cookieJwtAuth, async (req, res, next) => {
 
     const radiography = await radiographyController.create(radiographyInfo, next)
 
-    if(radiography) res.status(201).send()
+    if(radiography) res.status(201).send({})
 })
 
 router.get('', async (req, res, next) => {

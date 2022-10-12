@@ -30,7 +30,7 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
         const access_token = signAccessToken(user.id)
 
         res.cookie('access_token', access_token, cookieOptions)
-        .send()
+        .send({})
     }
 })
 
