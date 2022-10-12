@@ -1,34 +1,17 @@
 const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
-const {Redirect} = require('../classes')
 const createError = require('http-errors')
 const {signAccessToken, signRefreshToken, signResetPasswordToken, verifyRefreshToken, verifyResetPasswordToken} = require('../helpers/jwtHelper')
 const {checkUserExistance, getUserId, getUserEmail} = require('../utils/dbFunctions')
 const {sendResetPasswordEmail} = require('../helpers/emailSender')
-const {signUpSchema, logInSchema} = require('../helpers/validators')
+const {signUpSchema} = require('../helpers/validators')
 const {validator} = require('../middleware/validator.middleware')
 const {isLoggedIn} = require('../middleware/cookies.middleware')
+const {apiBaseUrl, cookieOptions} = require('../config')
 
 const basePath = '/users'
 
-//const apiBaseUrl = 'http://localhost:3000'
-const apiBaseUrl = 'https://osia-api-production.up.railway.app'
-
-const cookieOptions = {
-    httpOnly: true,
-    maxAge: 1000 * 60 * 60 * 24 * 7,
-    sameSite: 'none',
-    secure: true
-}
-
 router.get('/register', isLoggedIn, () => {})
-
-router.get('/login', isLoggedIn, () => {})
-
-router.get('/logout', (req, res) => {
-    res.clearCookie('access_token', {sameSite: 'none', secure: true})
-    .send({redirect: new Redirect('./LogIn.html', 'You are not logged in')})
-})
 
 router.post('/register', signUpSchema, validator, async (req, res, next) => {
     const {name, surname, email, phone, password} = req.body
@@ -45,24 +28,6 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
         .send({
             user,
             access_token
-        })
-    }
-})
-
-router.post('/login', logInSchema, validator, async (req, res, next) => {
-    const {email, password} = req.body
-
-    const userInfo = {email, password}
-
-    const user = await userController.login(userInfo, next)
-
-    if(user) {
-        const access_token = signAccessToken(user.id)
-
-        res.cookie('access_token', access_token, cookieOptions)
-        .send({
-            user,
-            access_token        
         })
     }
 })

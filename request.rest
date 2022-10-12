@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ### login
-POST {{baseUrl}}/users/login
+POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
@@ -38,7 +38,7 @@ POST {{baseUrl}}/radiographies/upload
 Content-Type: application/json
 
 {
-    "imageRoute" : "./images/hands.jpg",
+    "imageRoute" : "./public/images/1",
     "bodyPart" : "Brazo",
     "userId" : "1"
 }
@@ -56,5 +56,5 @@ DELETE {{baseUrl}}/radiographies/delete
 Content-Type: application/json
 
 {
-    "imageRoute" : "./images/hands.jpg"
+    "imageRoute" : "./public/images/1"
 }
