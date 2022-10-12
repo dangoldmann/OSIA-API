@@ -1,20 +1,5 @@
 const jwt = require('jsonwebtoken')
 
-const signToken = (userId, secret, expiresIn) => {
-    const payload = {id: userId}
-    const options = {expiresIn}
-
-    return jwt.sign(payload, secret, options)
-}
-
-const verifyToken = (token, secret) => {
-    try {
-        return jwt.verify(token, secret)
-    } catch (error) {
-        return error
-    }
-}
-
 const signAccessToken = userId => {
     const payload = {id: userId}
     const secret = process.env.ACCESS_TOKEN_SECRET
