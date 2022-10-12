@@ -1,37 +1,14 @@
 const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
 const createError = require('http-errors')
-const {signAccessToken, signRefreshToken, signResetPasswordToken, verifyRefreshToken, verifyResetPasswordToken} = require('../helpers/jwtHelper')
+const {signResetPasswordToken, verifyResetPasswordToken} = require('../helpers/jwtHelper')
 const {checkUserExistance, getUserId, getUserEmail} = require('../utils/dbFunctions')
 const {sendResetPasswordEmail} = require('../helpers/emailSender')
-const {signUpSchema} = require('../helpers/validators')
-const {validator} = require('../middleware/validator.middleware')
-const {isLoggedIn} = require('../middleware/cookies.middleware')
-const {apiBaseUrl, cookieOptions} = require('../config')
+const {apiBaseUrl} = require('../config')
 
 const basePath = '/users'
 
-router.get('/register', isLoggedIn, () => {})
-
-router.post('/register', signUpSchema, validator, async (req, res, next) => {
-    const {name, surname, email, phone, password} = req.body
-
-    const userInfo = {name, surname, email, phone, password}
-    
-    const user = await userController.create(userInfo, next)
-    
-    if(user){
-        const access_token = signAccessToken(user.id)
-
-        res.cookie('access_token', access_token, cookieOptions)
-        .status(201)
-        .send({})
-    }
-})
-
 router.get('/all', async (req, res) => {
-    if(req.get('origin') !== 'http://127.0.0.1:5500') return res.sendStatus(403) 
-    
     const users = await userController.getAll()
     res.send({users})
 })

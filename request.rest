@@ -2,7 +2,7 @@
 # @baseUrl = https://osia-api-production.up.railway.app
 
 ### registrar a un nuevo usuario
-POST {{baseUrl}}/users/register
+POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
