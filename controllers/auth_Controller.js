@@ -6,7 +6,7 @@ class authController {
     }
 
     login(userInfo, next) {
-        return authService.login(userInfo, next)
+        return auth_Service.login(userInfo, next)
     }
 }
 
