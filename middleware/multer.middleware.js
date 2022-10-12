@@ -19,10 +19,10 @@ const upload = multer({
     storage,
     limits: {fileSize: 5000000},
     fileFilter: (req, file, cb) => {
-        const fileTypes = /jpeg|jpg|png/
+        const fileTypes = /jpeg|jpg|png|jfif/
         const mimetype = fileTypes.test(file.mimetype)
         const extname = fileTypes.test(path.extname(file.originalname))
-
+       
         if(mimetype && extname) return cb(null, true)
         cb(createError.BadRequest('El archivo debe ser una imagen valida'))
     }
