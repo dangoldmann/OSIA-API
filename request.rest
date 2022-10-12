@@ -58,3 +58,11 @@ Content-Type: application/json
 {
     "imageRoute" : "./public/images/1"
 }
+
+### 
+POST {{baseUrl}}/auth/refresh-token
+Content-Type: application/json
+
+{
+    "refreshToken" : "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjY1NTQyMzQxLCJleHAiOjE2OTcwOTk5NDF9.UNdjqYr5wgPCvZiF1vATMi_JhtBj5bun2klcx4PEC68"
+}
