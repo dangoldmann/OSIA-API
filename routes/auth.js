@@ -14,7 +14,9 @@ router.get('/register', isLoggedIn, () => {})
 router.get('/login', isLoggedIn, () => {})
 
 router.get('/logout', (req, res) => {
-    res.clearCookie('access_token', {sameSite: 'none', secure: true})
+    res
+    .clearCookie('access_token', {sameSite: 'none', secure: true})
+    .clearCookie('refresh_token', {sameSite: 'none', secure: true})
     .send({
         redirect: {
             destination: './LogIn.html'
@@ -31,8 +33,11 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
     
     if(user){
         const access_token = signAccessToken(user.id)
+        const refresh_token = signRefreshToken(user.id)
 
-        res.cookie('access_token', access_token, cookieOptions)
+        res
+        .cookie('access_token', access_token, cookieOptions)
+        .cookie('refresh_token', refresh_token, cookieOptions)
         .status(201)
         .send({})
     }
@@ -49,8 +54,10 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
         const access_token = signAccessToken(user.id)
         const refresh_token = signRefreshToken(user.id)
 
-        res.cookie('access_token', access_token, cookieOptions)
-        .send({access_token, refresh_token})
+        res
+        .cookie('access_token', access_token, cookieOptions)
+        .cookie('refresh_token', refresh_token, cookieOptions)
+        .send({})
     }
 })
 
