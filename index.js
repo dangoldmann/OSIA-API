@@ -12,6 +12,7 @@ const {router: radiographyRoutes, basePath: radiographyBasePath} = require('./ro
 const {router: userRoutes, basePath: userBasePath} = require('./routes/users');
 
 // SETTINGS
+app.use(express.static(__dirname + '/views/public'))
 app.set('view engine', 'ejs');
 
 // MIDDLEWARES
