@@ -38,8 +38,7 @@ const cookieJwtAuth = (req, res, next) => {
         })
     }
     
-    const userId = payload.id
-    req.userId = userId
+    req.userId = payload.id
     return next()
 }
 
