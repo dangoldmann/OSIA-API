@@ -32,8 +32,7 @@ const cookieJwtAuth = (req, res, next) => {
                 message: payload.message
             },
             redirect: {
-                destination: './LogIn.html',
-                reason: 'You are not logged in'
+                destination: './LogIn.html'
             }
         })
     }
