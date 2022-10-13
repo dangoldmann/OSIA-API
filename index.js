@@ -25,7 +25,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({extended: false}));
 
 // ROUTES
-app.get('/', cookieJwtAuth, (req, res) => {});  
+app.get('/', cookieJwtAuth, () => {});  
 
 app.use(authBasePath, authRoutes);
 app.use(radiographyBasePath, radiographyRoutes);
