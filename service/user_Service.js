@@ -10,6 +10,31 @@ class userService {
         return users
     }
 
+    async getFullName(userId) {
+        let sql = `select name, surname from user where id = ${userId}`
+        const [rows, _] = await db.execute(sql)
+        const fullName = `${rows[0].name} ${rows[0].surname}`
+        return fullName
+    }
+
+    async getUserInfo(userId, next) {
+        const isUser = await checkUserExistance('id', userId)
+        if(!isUser) return next(createError.BadRequest('User not found'))
+
+        let sql = `select name, surname, email, phone from user where id = ${userId}`
+        const [rows, _] = await db.execute(sql)
+
+        const user = rows[0]
+
+        const userInfo = {
+            fullName: `${user.name} ${user.surname}`,
+            email: user.email,
+            phone: user.phone
+        }
+
+        return userInfo
+    }
+
     async updatePassword(userInfo, next){
         try
         {

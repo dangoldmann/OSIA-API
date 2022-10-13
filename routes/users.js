@@ -5,12 +5,23 @@ const {signResetPasswordToken, verifyResetPasswordToken} = require('../helpers/j
 const {checkUserExistance, getUserId, getUserEmail} = require('../utils/dbFunctions')
 const {sendResetPasswordEmail} = require('../helpers/emailSender')
 const {apiBaseUrl} = require('../config')
+const {cookieJwtAuth} = require('../middleware/cookies.middleware')
 
 const basePath = '/users'
 
 router.get('/all', async (req, res) => {
     const users = await userController.getAll()
     res.send({users})
+})
+
+router.get('/full-name', cookieJwtAuth, async (req, res) => {
+    const fullName = await userController.getFullName(req.userId)
+    res.send({fullName})
+})
+
+router.get('/info', cookieJwtAuth, async (req, res, next) => {
+    const userInfo = await userController.getUserInfo(req.userId, next)
+    res.send({userInfo})
 })
 
 router.post('/forgot-password', async (req, res, next) => {
