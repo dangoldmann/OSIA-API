@@ -6,8 +6,11 @@ const {validateEmail} = require('../utils/dbFunctions')
 class authService {
     async register(userInfo, next) {
         try {
-            const {name, surname, email, phone, password} = userInfo
-        
+            let {name, surname, email, phone, password} = userInfo
+            
+            name = name[0].toUpperCase() + name.substring(1, name.length)
+            surname = surname[0].toUpperCase() + surname.substring(1, surname.length)
+            
             const hashedPassword = bcrypt.hashSync(password, 10)
 
             const isEmailValid = await validateEmail(email)
