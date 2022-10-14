@@ -2,6 +2,7 @@ const path = require('path')
 const multer = require('multer')
 const createError = require('http-errors')
 const fs = require('fs-extra')
+const date = new Date()
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -10,8 +11,12 @@ const storage = multer.diskStorage({
         cb(null, path)
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname)
-        //cb(null, `${file.fieldname} - ${Date.now().To} ${path.extname(file.originalname)}`)
+        const fullDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()} ${date.getHours()}-${date.getMinutes()}`
+        const imageName = file.originalname.split('.')[0]
+        let extname = path.extname(file.originalname)
+        if(extname == '.jfif') extname = '.jpg'
+
+        cb(null, `${imageName} ${fullDate}${extname}`)
     }
 })
 
