@@ -11,7 +11,7 @@ const signAccessToken = userId => {
 const signRefreshToken = userId => {
     const payload = {id: userId}
     const secret = process.env.REFRESH_TOKEN_SECRET
-    const options = {expiresIn: '1y'}
+    const options = {expiresIn: '90d'}
 
     return jwt.sign(payload, secret, options)
 }
