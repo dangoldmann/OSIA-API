@@ -4,7 +4,7 @@ const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../help
 const {isLoggedIn} = require('../middleware/cookies.middleware')
 const {signUpSchema, logInSchema} = require('../helpers/validators')
 const {validator} = require('../middleware/validator.middleware')
-const {cookieOptions} = require('../config')
+const {accessTokenCookieOptions, refreshTokenCookieOptions} = require('../config')
 const createError = require('http-errors')
 
 const basePath = '/auth'
@@ -34,10 +34,10 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
     if(user){
         const access_token = signAccessToken(user.id)
         const refresh_token = signRefreshToken(user.id)
-
+        
         res
-        .cookie('access_token', access_token, cookieOptions)
-        .cookie('refresh_token', refresh_token, cookieOptions)
+        .cookie('access_token', access_token, accessTokenCookieOptions)
+        .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
         .status(201)
         .send({})
     }
@@ -45,7 +45,7 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
 
 router.post('/login', logInSchema, validator, async (req, res, next) => {
     const {email, password} = req.body
-
+    
     const userInfo = {email, password}
 
     const user = await auth_Controller.login(userInfo, next)
@@ -53,10 +53,9 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
     if(user) {
         const access_token = signAccessToken(user.id)
         const refresh_token = signRefreshToken(user.id)
-
         res
-        .cookie('access_token', access_token, cookieOptions)
-        .cookie('refresh_token', refresh_token, cookieOptions)
+        .cookie('access_token', access_token, accessTokenCookieOptions)
+        .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
         .send({})
     }
 })
