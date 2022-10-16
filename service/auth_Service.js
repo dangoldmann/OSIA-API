@@ -10,6 +10,7 @@ class authService {
             
             name = name[0].toUpperCase() + name.substring(1, name.length)
             surname = surname[0].toUpperCase() + surname.substring(1, surname.length)
+            email = email.toLowerCase()
             
             const hashedPassword = bcrypt.hashSync(password, 10)
 
