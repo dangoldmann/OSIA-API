@@ -56,7 +56,7 @@ DELETE {{baseUrl}}/radiographies/delete
 Content-Type: application/json
 
 {
-    "imageRoute" : "./public/images/1"
+    "imageRoute" : ""
 }
 
 ### 
