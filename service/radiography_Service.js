@@ -1,26 +1,21 @@
 const db = require('../db/database')
-const {checkUserExistance, getBodyPartId, checkImageExistance} = require('../utils/dbFunctions')
+const {checkUserExistance, checkImageExistance} = require('../utils/dbFunctions')
 const createError = require('http-errors')
 
 class radiographyService {
     async create(radiographyInfo, next) {
         try{
-            const {imageRoute, bodyPart, userId} = radiographyInfo
+            const {imageRoute, userId} = radiographyInfo
             
             const isUser = await checkUserExistance('id', userId)
             
             if(!isUser) return next(createError.BadRequest('User not found'))
-
-            const bodyPartId = await getBodyPartId(bodyPart)
             
-            if(bodyPartId == -1) return next(createError.BadRequest('Body part not valid'))
-            
-            let sql = `insert into radiography (image_route, id_body_part, id_user) values ('${imageRoute}', ${bodyPartId}, ${userId})`
+            let sql = `insert into radiography (image_route, id_user) values ('${imageRoute}', ${userId})`
             await db.execute(sql)
 
             const newRadiography = {
                 imageRoute,
-                bodyPartId,
                 userId
             }
 
