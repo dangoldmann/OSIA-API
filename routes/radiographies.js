@@ -14,7 +14,7 @@ router.post('/upload', cookieJwtAuth, async (req, res, next) => {
         const fullImageName = setImageName(req.file)
         const imageRoute = `./public/images/${req.userId}/${fullImageName}`
         
-        const radiographyInfo = {imageRoute, userId: req.userId}
+        const radiographyInfo = {imageRoute, userId: req.userId, date: req.body.date}
 
         const radiography = await radiographyController.create(radiographyInfo, next)
 
