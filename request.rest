@@ -39,7 +39,6 @@ Content-Type: application/json
 
 {
     "imageRoute" : "./public/images/1",
-    "bodyPart" : "Brazo",
     "userId" : "1"
 }
 
