@@ -3,21 +3,23 @@ const radiographyController = require('../controllers/radiography_Controller')
 const createError = require('http-errors')
 const {upload} = require('../middleware/multer.middleware')
 const {cookieJwtAuth} = require('../middleware/cookies.middleware')
+const {setImageName} = require('../utils/multerFunctions')
 
 const basePath = '/radiographies'
 
 router.post('/upload', cookieJwtAuth, async (req, res, next) => {
-    upload(req, res, err => {
-        if(err) next(createError.BadRequest(err.message))
+    upload(req, res, async err => {
+        if(err) return next(createError.BadRequest(err.message))
+        
+        const fullImageName = setImageName(req.file)
+        const imageRoute = `./public/images/${req.userId}/${fullImageName}`
+        
+        const radiographyInfo = {imageRoute, userId: req.userId}
+
+        const radiography = await radiographyController.create(radiographyInfo, next)
+
+        if(radiography) res.status(201).send({})
     })
-    
-    const imageRoute = `./public/images/${req.userId}`
-
-    const radiographyInfo = {imageRoute, bodyPart: 'Brazo', userId: req.userId}
-
-    const radiography = await radiographyController.create(radiographyInfo, next)
-
-    if(radiography) res.status(201).send({})
 })
 
 router.get('', async (req, res, next) => {

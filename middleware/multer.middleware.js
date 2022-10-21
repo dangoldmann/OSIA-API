@@ -1,8 +1,7 @@
-const path = require('path')
 const multer = require('multer')
 const createError = require('http-errors')
 const fs = require('fs-extra')
-const date = new Date()
+const {setImageName, filterImage} = require('../utils/multerFunctions')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -11,12 +10,8 @@ const storage = multer.diskStorage({
         cb(null, path)
     },
     filename: (req, file, cb) => {
-        const fullDate = `${date.getFullYear()}-${date.getMonth()}-${date.getDay()} ${date.getHours()}-${date.getMinutes()}`
-        const imageName = file.originalname.split('.')[0]
-        let extname = path.extname(file.originalname)
-        if(extname == '.jfif') extname = '.jpg'
-
-        cb(null, `${imageName} ${fullDate}${extname}`)
+        const fullImageName = setImageName(file)
+        cb(null, fullImageName)
     }
 })
 
@@ -24,11 +19,8 @@ const upload = multer({
     storage,
     limits: {fileSize: 5000000},
     fileFilter: (req, file, cb) => {
-        const fileTypes = /jpeg|jpg|png|jfif/
-        const mimetype = fileTypes.test(file.mimetype)
-        const extname = fileTypes.test(path.extname(file.originalname))
-       
-        if(mimetype && extname) return cb(null, true)
+        const isValid = filterImage(file)
+        if(isValid) return cb(null, true)
         cb(createError.BadRequest('El archivo debe ser una imagen valida'))
     }
 }).single('image')
