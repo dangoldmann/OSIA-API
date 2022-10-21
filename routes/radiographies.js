@@ -14,14 +14,25 @@ router.post('/upload', cookieJwtAuth, async (req, res, next) => {
         const fullImageName = setImageName(req.file)
         const imageRoute = `./public/images/${req.userId}/${fullImageName}`
         
-        const radiographyInfo = {imageRoute, userId: req.userId, date: req.body.date}
+        //const injury = scanAI(req.file) // SCAN AI
+
+        const radiographyInfo = {imageRoute, userId: req.userId, date: req.body.date, injury: 'Hernia de disco'}
 
         const radiography = await radiographyController.create(radiographyInfo, next)
-
-        if(radiography) res.status(201).send({})
-
-        // ESCANEAR CON IA Y DEVOLVER RESULTADO
+        
+        if(radiography) res.send({
+            redirect: {
+                destination: './ResultadosImagen.html'
+            }
+        })
     })
+})
+
+router.get('/all', async (req, res, next) => {
+    
+    const radiographies = await radiographyController.getAll(1, next)
+
+    if(radiographies) res.send({radiographies})
 })
 
 router.get('', async (req, res, next) => {

@@ -5,6 +5,10 @@ class radiographyController {
         return radiography_Service.create(radiographyInfo, next)
     }
 
+    getAll(userId, next){
+        return radiography_Service.getAll(userId, next)
+    }
+
     getByUserId(userInfo, next){
         return radiography_Service.getByUserId(userInfo, next)
     }

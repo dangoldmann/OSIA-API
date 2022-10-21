@@ -43,7 +43,7 @@ Content-Type: application/json
 }
 
 ### obteniendo las radiografias de un usuario
-GET {{baseUrl}}/radiographies
+GET {{baseUrl}}/radiographies/all
 Content-Type: application/json
 
 {
