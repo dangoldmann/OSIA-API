@@ -2,43 +2,53 @@ const router = require('express').Router()
 const radiographyController = require('../controllers/radiography_Controller')
 const createError = require('http-errors')
 const {upload} = require('../middleware/multer.middleware')
-const {cookieJwtAuth} = require('../middleware/cookies.middleware')
 const {setImageName} = require('../utils/multerFunctions')
+const {verifyToken} = require('../middleware/cookies.middleware')
+const jwt = require('jsonwebtoken')
 
 const basePath = '/radiographies'
 
-router.post('/upload', cookieJwtAuth, async (req, res, next) => {
-    upload(req, res, async err => {
-        if(err) return next(createError.BadRequest(err.message))
-        
-        const fullImageName = setImageName(req.file)
-        const imageRoute = `./public/images/${req.userId}/${fullImageName}`
-        
-        //const injury = scanAI(req.file) // SCAN AI
+router.post('/upload', verifyToken, async (req, res, next) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
 
-        const radiographyInfo = {imageRoute, userId: req.userId, date: req.body.date, injury: 'Hernia de disco'}
-
-        const radiography = await radiographyController.create(radiographyInfo, next)
-        
-        if(radiography) res.send({
-            redirect: {
-                destination: './ResultadosImagen.html'
-            }
+        req.userId = payload.id
+        upload(req, res, async err => {
+            if(err) return next(createError.BadRequest(err.message))
+            
+            const fullImageName = setImageName(req.file)
+            const imageRoute = `./public/images/${payload.id}/${fullImageName}`
+            
+            //const injury = scanAI(req.file) // SCAN AI
+    
+            const radiographyInfo = {imageRoute, userId: payload.id, date: req.body.date, injury: 'Hernia de disco'}
+    
+            const radiography = await radiographyController.create(radiographyInfo, next)
+            
+            if(radiography) res.send({
+                redirect: {
+                    destination: './ResultadosImagen.html'
+                }
+            })
         })
     })
 })
 
-router.get('/all', async (req, res, next) => {
+router.get('/all', verifyToken, async (req, res, next) => {
     
-    const radiographies = await radiographyController.getAll(1, next)
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
 
-    if(radiographies) res.send({radiographies})
-})
+        const radiographies = await radiographyController.getAll(payload.id, next)
+
+        if(radiographies) res.send({radiographies})
+    })     
+})   
 
 router.get('', async (req, res, next) => {
     const {userId} = req.body
     
-    if(!userId) return next(createError.BadRequest('You must complete all the fields'))
+    if(!userId) return next({error: createError.BadRequest('You must complete all the fields')})
     
     const userInfo = {userId}
 
@@ -50,7 +60,7 @@ router.get('', async (req, res, next) => {
 router.delete('/delete', async (req, res, next) => {
     const {imageRoute} = req.body
 
-    if(!imageRoute) return next(createError.BadRequest('You must complete all the fields'))
+    if(!imageRoute) return next({error: createError.BadRequest('You must complete all the fields')})
 
     const radiographyInfo = {imageRoute}
 

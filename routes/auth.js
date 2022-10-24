@@ -1,21 +1,15 @@
 const router = require('express').Router()
 const auth_Controller = require('../controllers/auth_Controller')
 const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../helpers/jwtHelper')
-const {isLoggedIn} = require('../middleware/cookies.middleware')
 const {signUpSchema, logInSchema} = require('../helpers/validators')
 const {validator} = require('../middleware/validator.middleware')
-const {accessTokenCookieOptions, refreshTokenCookieOptions} = require('../config')
+const {refreshTokenCookieOptions} = require('../config')
 const createError = require('http-errors')
 
 const basePath = '/auth'
 
-router.get('/register', isLoggedIn, () => {})
-
-router.get('/login', isLoggedIn, () => {})
-
 router.get('/logout', (req, res) => {
     res
-    .clearCookie('access_token', {sameSite: 'none', secure: true})
     .clearCookie('refresh_token', {sameSite: 'none', secure: true})
     .send({
         redirect: {
@@ -36,10 +30,9 @@ router.post('/register', signUpSchema, validator, async (req, res, next) => {
         const refresh_token = signRefreshToken(user.id)
         
         res
-        .cookie('access_token', access_token, accessTokenCookieOptions)
         .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
         .status(201)
-        .send({})
+        .send({access_token})
     }
 })
 
@@ -54,17 +47,15 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
         const access_token = signAccessToken(user.id)
         const refresh_token = signRefreshToken(user.id)
         res
-        .cookie('access_token', access_token, accessTokenCookieOptions)
         .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
-        .send({})
+        .send({access_token})
     }
 })
 
 router.post('/refresh-token', (req, res, next) => {
     try {
-        const {refreshToken} = req.body    
-        if(!refreshToken) return next(createError.BadRequest('Token not found'))
-
+        const refreshToken = req.cookies.refresh_token  
+        
         const payload = verifyRefreshToken(refreshToken)
 
         if(payload.message) {
@@ -80,13 +71,13 @@ router.post('/refresh-token', (req, res, next) => {
                 }
             })
         }
+        
+        const access_token = signAccessToken(payload.id)
+        const refresh_token = signRefreshToken(payload.id)
 
-        const userId = payload.id
-
-        const access_token = signAccessToken(userId)
-        const refresh_token = signRefreshToken(userId)
-
-        res.send({access_token, refresh_token})
+        res
+        .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
+        send({access_token})
     } catch (error) {
         return next(error)
     }

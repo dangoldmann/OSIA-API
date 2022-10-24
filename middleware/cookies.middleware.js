@@ -1,44 +1,15 @@
-const {verifyAccessToken} = require('../helpers/jwtHelper')
+const createError = require('http-errors')
 
-const isLoggedIn = (req, res, next) => {
-    const access_token = req.cookies.access_token
-
-    const payload = verifyAccessToken(access_token)
+const verifyToken = (req, res, next) => {
+    const bearerHeader = req.headers['authorization']
     
-    if(payload.message) {
-        res.clearCookie('access_token', {sameSite: 'none', secure: true})
+    if(typeof bearerHeader !== 'undefined'){
+        const bearerToken = bearerHeader.split(' ')[1]
+        req.token = bearerToken
+        
         return next()
     }
-
-    return res.send({
-        redirect: {
-            destination: './HomePage.html',
-            reason: 'You are already logged in'
-        }
-    })
+    return next({error: createError.Unauthorized('Token not found')})
 }
 
-const cookieJwtAuth = (req, res, next) => {
-    const access_token = req.cookies.access_token
-    
-    const payload = verifyAccessToken(access_token)
-    
-    if(payload.message) {
-        res.clearCookie('access_token', {sameSite: 'none', secure: true})
-        
-        return res.status(401).send({
-            error: {
-                status: 401,
-                message: payload.message
-            },
-            redirect: {
-                destination: './LogIn.html'
-            }
-        })
-    }
-    
-    req.userId = payload.id
-    return next()
-}
-
-module.exports = {isLoggedIn, cookieJwtAuth}
+module.exports = {verifyToken}

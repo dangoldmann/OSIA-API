@@ -1,11 +1,13 @@
 const router = require('express').Router()
 const userController = require('../controllers/user_Controller')
 const createError = require('http-errors')
-const {signResetPasswordToken, verifyResetPasswordToken} = require('../helpers/jwtHelper')
+const {signResetPasswordToken, verifyResetPasswordToken, verifyRefreshToken} = require('../helpers/jwtHelper')
 const {checkUserExistance, getUserId, getUserEmail} = require('../utils/dbFunctions')
 const {sendResetPasswordEmail} = require('../helpers/emailSender')
 const {apiBaseUrl} = require('../config')
-const {cookieJwtAuth} = require('../middleware/cookies.middleware')
+const {verifyToken} = require('../middleware/cookies.middleware')
+const jwt = require('jsonwebtoken')
+const { create } = require('../service/radiography_Service')
 
 const basePath = '/users'
 
@@ -14,14 +16,22 @@ router.get('/all', async (req, res) => {
     res.send({users})
 })
 
-router.get('/full-name', cookieJwtAuth, async (req, res) => {
-    const fullName = await userController.getFullName(req.userId)
-    res.send({fullName})
+router.get('/full-name', verifyToken, async (req, res) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
+
+        const fullName = await userController.getFullName(payload.id)
+        res.send({fullName})
+    })
 })
 
-router.get('/info', cookieJwtAuth, async (req, res, next) => {
-    const userInfo = await userController.getUserInfo(req.userId, next)
-    res.send({userInfo})
+router.get('/info', verifyToken, async (req, res, next) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
+
+        const userInfo = await userController.getUserInfo(payload.id, next)
+        res.send({userInfo})
+    })
 })
 
 router.post('/forgot-password', async (req, res, next) => {
