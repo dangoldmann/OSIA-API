@@ -22,6 +22,14 @@ async function getUserId(field, value){
     return result[0].id
 }
 
+async function getUserFullName(id){
+    const sql = `select name, surname from user where id = ${id}`
+    const [result, _] = await db.execute(sql)
+
+    const fullName = result[0].name + ' '  + result[0].surname
+    return fullName
+}
+
 async function getUserEmail(field, value){
     let sql = `select email from user where ${field} = '${value}'`
     let [result, _] = await db.execute(sql)
@@ -46,4 +54,11 @@ async function checkImageExistance(id)
     return result.length != 0
 }
 
-module.exports = {validateEmail, checkUserExistance, getBodyPartId, checkImageExistance, getUserId, getUserEmail}
+async function getRadiography(id){
+    const sql = `select * from radiography where id = ${id}`
+    const [result, _] = await db.execute(sql)
+
+    return result[0]
+}
+
+module.exports = {validateEmail, checkUserExistance, getBodyPartId, checkImageExistance, getUserId, getUserFullName, getUserEmail, getRadiography}

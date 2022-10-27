@@ -48,7 +48,12 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
         const access_token = signAccessToken(user.id)
         const refresh_token = signRefreshToken(user.id)
         res
-        .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
+        .cookie('refresh_token', refresh_token, {
+            httpOnly: true,
+            maxAge: 7776000000,
+            sameSite: 'none',
+            secure: true
+        })
         .send({access_token})
     }
 })

@@ -14,7 +14,11 @@ class radiographyService {
             let sql = `insert into radiography (image_route, id_user, date, injury) values ('${imageRoute}', ${userId}, '${date}', '${injury}')`
             await db.execute(sql)
 
+            sql = `select id from radiography where image_route = '${imageRoute}'`
+            const [result, _] = await db.execute(sql)
+
             const newRadiography = {
+                id: result[0].id,
                 imageRoute,
                 userId
             }

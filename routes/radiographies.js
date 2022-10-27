@@ -3,6 +3,7 @@ const radiographyController = require('../controllers/radiography_Controller')
 const createError = require('http-errors')
 const {upload} = require('../middleware/multer.middleware')
 const {setImageName} = require('../utils/multerFunctions')
+const {getUserFullName, getRadiography} = require('../utils/dbFunctions')
 const {verifyToken} = require('../middleware/cookies.middleware')
 const jwt = require('jsonwebtoken')
 
@@ -24,13 +25,30 @@ router.post('/upload', verifyToken, async (req, res, next) => {
             const radiographyInfo = {imageRoute, userId: payload.id, date: req.body.date, injury: 'Hernia de disco'}
     
             const radiography = await radiographyController.create(radiographyInfo, next)
-            
+
             if(radiography) res.send({
-                redirect: {
-                    destination: './ResultadosImagen.html'
-                }
+                radiographyId: radiography.id
             })
         })
+    })
+})
+
+router.get('/:id/result', verifyToken, (req, res) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
+
+        const radiography = await getRadiography(req.params.id)
+        
+        if(!radiography) return
+
+        const result = {
+            date: radiography.date,
+            fullName: await getUserFullName(1),
+            injury: radiography.injury,
+            precision: radiography.precision
+        }
+        
+        res.send({result})
     })
 })
 
