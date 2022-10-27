@@ -1,5 +1,5 @@
-//const apiBaseUrl = 'http://localhost:3000'
-const apiBaseUrl = 'https://osia-api-production.up.railway.app'
+const apiBaseUrl = 'http://localhost:3000'
+//const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
 const refreshTokenCookieOptions = {
     httpOnly: true,
@@ -7,6 +7,5 @@ const refreshTokenCookieOptions = {
     sameSite: 'none',
     secure: true
 }
-
 
 module.exports = {apiBaseUrl, refreshTokenCookieOptions}
