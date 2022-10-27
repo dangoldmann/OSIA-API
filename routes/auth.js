@@ -4,7 +4,8 @@ const {signAccessToken, signRefreshToken, verifyRefreshToken} = require('../help
 const {signUpSchema, logInSchema} = require('../helpers/validators')
 const {validator} = require('../middleware/validator.middleware')
 const {refreshTokenCookieOptions} = require('../config')
-const createError = require('http-errors')
+const { verifyToken } = require('../middleware/cookies.middleware')
+const jwt = require('jsonwebtoken')
 
 const basePath = '/auth'
 
@@ -50,6 +51,17 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
         .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
         .send({access_token})
     }
+})
+
+router.post('/access-token', verifyToken, (req, res, next) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, err => {
+        if(!err) return res.send({
+            redirect: {
+                destination: './HomePage.html'
+            }
+        })
+        return res.send({})
+    })
 })
 
 router.post('/refresh-token', (req, res, next) => {
