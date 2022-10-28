@@ -43,24 +43,6 @@ class radiographyService {
             
         }
     }
-    
-    async getByUserId(userInfo, next){
-        try{
-            const {userId} = userInfo
-
-            const isUser = await checkUserExistance('id', userId)
-            
-            if(!isUser) return next(createError.BadRequest('User not found'))
-
-            let sql = `select image_route from radiography where id_user = ${userId}`
-            var [imageRoutes, _] = await db.execute(sql)
-
-            return imageRoutes
-        }
-        catch(err){
-            console.log(err.message)
-        }
-    }
 
     async delete(radiographyInfo, next){
         try{

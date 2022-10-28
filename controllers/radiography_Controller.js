@@ -9,10 +9,6 @@ class radiographyController {
         return radiography_Service.getAll(userId, next)
     }
 
-    getByUserId(userInfo, next){
-        return radiography_Service.getByUserId(userInfo, next)
-    }
-
     delete(radiographyInfo, next){
         return radiography_Service.delete(radiographyInfo, next)
     }

@@ -37,7 +37,7 @@ router.get('/all', verifyToken, async (req, res, next) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
   
         const radiographies = await radiographyController.getAll(payload.id, next)
-
+        
         if(radiographies) res.send({radiographies})
     })
 })
@@ -50,7 +50,7 @@ router.get('/:id', async (req, res) => {
 })
 
 router.get('/:id/result', verifyToken, (req, res) => {
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async err => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
 
         const radiography = await getRadiography(req.params.id)
@@ -59,7 +59,7 @@ router.get('/:id/result', verifyToken, (req, res) => {
 
         const result = {
             date: radiography.date,
-            fullName: await getUserFullName(1),
+            fullName: await getUserFullName(payload.id),
             injury: radiography.injury,
             precision: radiography.precision
         }
@@ -68,19 +68,7 @@ router.get('/:id/result', verifyToken, (req, res) => {
     })
 })
 
-router.get('', async (req, res, next) => {
-    const {userId} = req.body
-
-    if(!userId) return next({error: createError.BadRequest('You must complete all the fields')})
-
-    const userInfo = {userId}
-
-    const imageRoutes = await radiographyController.getByUserId(userInfo, next)
-
-    if(imageRoutes) res.send({imageRoutes})
-})
-
-router.delete('/delete', async (req, res, next) => {
+router.delete('/:id', async (req, res, next) => {
     const {imageRoute} = req.body
 
     if(!imageRoute) return next({error: createError.BadRequest('You must complete all the fields')})
