@@ -48,7 +48,7 @@ async function getBodyPartId(name)
 
 async function checkImageExistance(id)
 {
-    let sql = `select * from radiography where image_route = '${id}'`
+    let sql = `select * from radiography where id = ${id}`
     let [result, _] = await db.execute(sql)
 
     return result.length != 0

@@ -44,20 +44,17 @@ class radiographyService {
         }
     }
 
-    async delete(radiographyInfo, next){
-        try{
-            const {imageRoute} = radiographyInfo
+    async delete(id, next){
+        try {
+            const isImage = await checkImageExistance(id)
+            if(!isImage) return next(createError.BadRequest('Radiography not found'))
 
-            const isImage = await checkImageExistance(imageRoute)
-            if(!isImage) return next(createError.BadRequest('Image not found'))
-
-            let sql = `delete from radiography where image_route = '${imageRoute}'`
+            const sql = `delete from radiography where id = ${id}`
             await db.execute(sql)
 
             return true
-        }
-        catch(err){
-            console.log(err.message)
+        } catch (error) {
+            console.log(error.message)
         }
     }
 }

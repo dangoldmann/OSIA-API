@@ -7,10 +7,11 @@ const {getUserFullName, getRadiography, getImagePath} = require('../utils/dbFunc
 const {verifyToken} = require('../middleware/cookies.middleware')
 const jwt = require('jsonwebtoken')
 const path = require('path')
+const fs = require('fs')
 
 const basePath = '/radiographies'
 
-router.post('/upload', verifyToken, async (req, res, next) => {
+router.post('/upload', verifyToken, (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
         
@@ -32,7 +33,7 @@ router.post('/upload', verifyToken, async (req, res, next) => {
     })
 })
 
-router.get('/all', verifyToken, async (req, res, next) => {
+router.get('/all', verifyToken, (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
   
@@ -68,16 +69,17 @@ router.get('/:id/result', verifyToken, (req, res) => {
     })
 })
 
-router.delete('/:id', async (req, res, next) => {
-    const {imageRoute} = req.body
+router.delete('/:id', verifyToken, (req, res, next) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async err => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
 
-    if(!imageRoute) return next({error: createError.BadRequest('You must complete all the fields')})
+        const imagePath = await getImagePath(req.params.id)
+        fs.unlinkSync(`..${imagePath}`, err => console.log(err))
+        
+        const isDeleted = await radiographyController.delete(req.params.id, next)
 
-    const radiographyInfo = {imageRoute}
-
-    const isDeleted = await radiographyController.delete(radiographyInfo, next)
-
-    if(isDeleted) res.send({isDeleted})
+        if(isDeleted) res.send({isDeleted})
+    })
 })
 
 module.exports = { router, basePath }
