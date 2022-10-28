@@ -35,7 +35,7 @@ class radiographyService {
             const isUser = await checkUserExistance('id', userId)
             if(!isUser) return next(createError.BadRequest('User not found'))
 
-            const sql = `select * from radiography where id = ${userId}`
+            const sql = `select id, date, injury from radiography where id_user = ${userId}`
             const [rows, _] = await db.execute(sql)
 
             return rows
