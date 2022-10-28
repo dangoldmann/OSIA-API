@@ -21,7 +21,7 @@ router.post('/upload', verifyToken, async (req, res, next) => {
             const imageRoute = `./public/images/${payload.id}/${fullImageName}`
             
             //const injury = scanAI(req.file) // SCAN AI
-    
+            
             const radiographyInfo = {imageRoute, userId: payload.id, date: req.body.date, injury: 'Hernia de disco'}
     
             const radiography = await radiographyController.create(radiographyInfo, next)
@@ -34,7 +34,7 @@ router.post('/upload', verifyToken, async (req, res, next) => {
 })
 
 router.get('/:id/result', verifyToken, (req, res) => {
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async err => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
 
         const radiography = await getRadiography(req.params.id)

@@ -5,6 +5,7 @@ const {signUpSchema, logInSchema} = require('../helpers/validators')
 const {validator} = require('../middleware/validator.middleware')
 const {refreshTokenCookieOptions} = require('../config')
 const { verifyToken } = require('../middleware/cookies.middleware')
+const createError = require('http-errors')
 const jwt = require('jsonwebtoken')
 
 const basePath = '/auth'
@@ -48,17 +49,12 @@ router.post('/login', logInSchema, validator, async (req, res, next) => {
         const access_token = signAccessToken(user.id)
         const refresh_token = signRefreshToken(user.id)
         res
-        .cookie('refresh_token', refresh_token, {
-            httpOnly: true,
-            maxAge: 7776000000,
-            sameSite: 'none',
-            secure: true
-        })
+        .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
         .send({access_token})
     }
 })
 
-router.post('/access-token', verifyToken, (req, res, next) => {
+router.post('/isLoggedIn', verifyToken, (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, err => {
         if(!err) return res.send({
             redirect: {
@@ -69,35 +65,43 @@ router.post('/access-token', verifyToken, (req, res, next) => {
     })
 })
 
+router.post('/isNotLoggedIn', verifyToken, (req, res) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, err => {
+        if(err) return res.send({
+            error: createError.Unauthorized(err.message),
+            redirect: {
+                destination: './LogIn.html'
+            }
+        })
+        res.send({})
+    })
+})
+
 router.post('/refresh-token', (req, res, next) => {
-    try {
-        const refreshToken = req.cookies.refresh_token  
+    const refreshToken = req.cookies.refresh_token  
         
-        const payload = verifyRefreshToken(refreshToken)
+    const payload = verifyRefreshToken(refreshToken)
 
-        if(payload.message) {
-            res.clearCookie('refresh_token', {sameSite: 'none', secure: true})
-        
-            return res.status(401).send({
-                error: {
-                    status: 401,
-                    message: payload.message
-                },
-                redirect: {
-                    destination: './LogIn.html'
-                }
-            })
-        }
-        
-        const access_token = signAccessToken(payload.id)
-        const refresh_token = signRefreshToken(payload.id)
-
-        res
-        .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
-        send({access_token})
-    } catch (error) {
-        return next(error)
+    if(payload.message) {
+        res.clearCookie('refresh_token', {sameSite: 'none', secure: true})
+    
+        return res.send({
+            error: {
+                message: payload.message
+            },
+            redirect: {
+                destination: './LogIn.html'
+            }
+        })
     }
+    
+    const access_token = signAccessToken(payload.id)
+    const refresh_token = signRefreshToken(payload.id)
+
+    res
+    .cookie('refresh_token', refresh_token, refreshTokenCookieOptions)
+    .send({access_token})
+    
 })
 
 module.exports = {router, basePath}
