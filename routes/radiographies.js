@@ -3,9 +3,10 @@ const radiographyController = require('../controllers/radiography_Controller')
 const createError = require('http-errors')
 const {upload} = require('../middleware/multer.middleware')
 const {setImageName} = require('../utils/multerFunctions')
-const {getUserFullName, getRadiography} = require('../utils/dbFunctions')
+const {getUserFullName, getRadiography, getImagePath} = require('../utils/dbFunctions')
 const {verifyToken} = require('../middleware/cookies.middleware')
 const jwt = require('jsonwebtoken')
+const path = require('path')
 
 const basePath = '/radiographies'
 
@@ -31,6 +32,13 @@ router.post('/upload', verifyToken, async (req, res, next) => {
             })
         })
     })
+})
+
+router.get('/:id', async (req, res) => {
+    const dirname = __dirname.substring(0, __dirname.length-7)
+    const imagePath = (await getImagePath(req.params.id)).substring(1)
+    const filePath = dirname + path.join(imagePath)
+    res.sendFile(filePath)
 })
 
 router.get('/:id/result', verifyToken, (req, res) => {
