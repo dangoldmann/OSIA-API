@@ -13,23 +13,32 @@ const basePath = '/radiographies'
 router.post('/upload', verifyToken, async (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
+        
         req.userId = payload.id
         upload(req, res, async err => {
             if(err) return next(createError.BadRequest(err.message))
-            
+
             const fullImageName = setImageName(req.file)
             const imageRoute = `/public/images/${payload.id}/${fullImageName}`
             
-            //const injury = scanAI(req.file) // SCAN AI
-            
             const radiographyInfo = {imageRoute, userId: payload.id, date: req.body['date'], injury: 'Hernia de disco'}
-    
+
             const radiography = await radiographyController.create(radiographyInfo, next)
 
             if(radiography) res.send({
                 radiographyId: radiography.id
             })
         })
+    })
+})
+
+router.get('/all', verifyToken, async (req, res, next) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
+  
+        const radiographies = await radiographyController.getAll(payload.id, next)
+
+        if(radiographies) res.send({radiographies})
     })
 })
 
@@ -45,7 +54,7 @@ router.get('/:id/result', verifyToken, (req, res) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
 
         const radiography = await getRadiography(req.params.id)
-        
+
         if(!radiography) return
 
         const result = {
@@ -54,27 +63,16 @@ router.get('/:id/result', verifyToken, (req, res) => {
             injury: radiography.injury,
             precision: radiography.precision
         }
-        
+
         res.send({result})
     })
 })
 
-router.get('/all', verifyToken, async (req, res, next) => {
-    
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
-        if(err) return res.send({error: createError.Unauthorized(err.message)})
-
-        const radiographies = await radiographyController.getAll(payload.id, next)
-
-        if(radiographies) res.send({radiographies})
-    })     
-})   
-
 router.get('', async (req, res, next) => {
     const {userId} = req.body
-    
+
     if(!userId) return next({error: createError.BadRequest('You must complete all the fields')})
-    
+
     const userInfo = {userId}
 
     const imageRoutes = await radiographyController.getByUserId(userInfo, next)
