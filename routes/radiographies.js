@@ -13,7 +13,6 @@ const basePath = '/radiographies'
 router.post('/upload', verifyToken, async (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
-
         req.userId = payload.id
         upload(req, res, async err => {
             if(err) return next(createError.BadRequest(err.message))
@@ -23,7 +22,7 @@ router.post('/upload', verifyToken, async (req, res, next) => {
             
             //const injury = scanAI(req.file) // SCAN AI
             
-            const radiographyInfo = {imageRoute, userId: payload.id, date: req.body.date, injury: 'Hernia de disco'}
+            const radiographyInfo = {imageRoute, userId: payload.id, date: req.body['date'], injury: 'Hernia de disco'}
     
             const radiography = await radiographyController.create(radiographyInfo, next)
 
