@@ -61,4 +61,12 @@ async function getRadiography(id){
     return result[0]
 }
 
-module.exports = {validateEmail, checkUserExistance, getBodyPartId, checkImageExistance, getUserId, getUserFullName, getUserEmail, getRadiography}
+async function getImagePath(id){
+    const sql = `select image_route from radiography where id = ${id}`
+    const [result, _] = await db.execute(sql)
+    
+    if(result[0]) return result[0].image_route
+    return
+}
+
+module.exports = {validateEmail, checkUserExistance, getBodyPartId, checkImageExistance, getUserId, getUserFullName, getUserEmail, getRadiography, getImagePath}
