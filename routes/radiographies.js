@@ -19,7 +19,7 @@ router.post('/upload', verifyToken, async (req, res, next) => {
             if(err) return next(createError.BadRequest(err.message))
             
             const fullImageName = setImageName(req.file)
-            const imageRoute = `./public/images/${payload.id}/${fullImageName}`
+            const imageRoute = `/public/images/${payload.id}/${fullImageName}`
             
             //const injury = scanAI(req.file) // SCAN AI
             
@@ -36,7 +36,7 @@ router.post('/upload', verifyToken, async (req, res, next) => {
 
 router.get('/:id', async (req, res) => {
     const dirname = __dirname.substring(0, __dirname.length-7)
-    const imagePath = (await getImagePath(req.params.id)).substring(1)
+    const imagePath = await getImagePath(req.params.id)
     const filePath = dirname + path.join(imagePath)
     res.sendFile(filePath)
 })
