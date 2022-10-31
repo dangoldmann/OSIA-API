@@ -73,8 +73,9 @@ router.delete('/:id', verifyToken, (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async err => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
 
+        const dirname = __dirname.substring(0, __dirname.length - 7)
         const imagePath = await getImagePath(req.params.id)
-        fs.unlinkSync(`..${imagePath}`, err => console.log(err))
+        fs.unlinkSync(dirname + path.join(imagePath), err => console.log(err))
         
         const isDeleted = await radiographyController.delete(req.params.id, next)
 
