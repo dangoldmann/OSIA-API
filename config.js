@@ -1,6 +1,8 @@
 const apiBaseUrl = 'http://localhost:3000'
 //const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
+const AIUrl = 'http://localhost:5000/predict'
+
 const refreshTokenCookieOptions = {
     httpOnly: true,
     maxAge: process.env.REFRESH_TOKEN_MAX_AGE,
@@ -8,4 +10,4 @@ const refreshTokenCookieOptions = {
     secure: true
 }
 
-module.exports = {apiBaseUrl, refreshTokenCookieOptions}
+module.exports = {apiBaseUrl, AIUrl, refreshTokenCookieOptions}
