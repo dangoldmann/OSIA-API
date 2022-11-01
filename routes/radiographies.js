@@ -8,8 +8,24 @@ const {verifyToken} = require('../middleware/cookies.middleware')
 const jwt = require('jsonwebtoken')
 const path = require('path')
 const fs = require('fs')
+const {AIUrl} = require('../config')
+const fetch = require('node-fetch')
 
 const basePath = '/radiographies'
+
+router.post('/scan', upload, async (req, res) => {
+    const response = await fetch(AIUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            'id':"257"
+        })
+    })
+    
+    res.send(response)
+})
 
 router.post('/upload', verifyToken, (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
@@ -21,7 +37,7 @@ router.post('/upload', verifyToken, (req, res, next) => {
 
             const fullImageName = setImageName(req.file)
             const imageRoute = `/public/images/${payload.id}/${fullImageName}`
-            
+
             const radiographyInfo = {imageRoute, userId: payload.id, date: req.body['date'], injury: 'Hernia de disco'}
 
             const radiography = await radiographyController.create(radiographyInfo, next)
