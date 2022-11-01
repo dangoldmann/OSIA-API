@@ -63,7 +63,7 @@ POST {{baseUrl}}/radiographies/scan
 Content-Type: application/json
 
 {
-    "id" : "257"
+    "id" : "258"
 }
 
 ### 
@@ -71,5 +71,5 @@ POST http://localhost:5000/predict
 Content-Type: application/json
 
 {
-    "id" : "257"
+    "id" : "258"
 }
