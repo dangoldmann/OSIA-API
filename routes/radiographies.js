@@ -8,27 +8,15 @@ const {verifyToken} = require('../middleware/cookies.middleware')
 const jwt = require('jsonwebtoken')
 const path = require('path')
 const fs = require('fs')
-const {AIUrl} = require('../config')
-const fetch = require('node-fetch')
+const {predictAI} = require('../helpers/ai')
 
 const basePath = '/radiographies'
 
 router.post('/flask-test', async (req, res, next) => {
-    try {
-        let response = await fetch('http://0.0.0.0:6000/predict', {
-            method: 'POST',
-            headers: {
-                'Content-Type' : 'application/json'
-            },
-            body: JSON.stringify({
-                id: req.body.id
-            })
-        })
-        response = await response.json()
-        res.send(response)
-    } catch (error) {
-        next(error)
-    }
+    const image_base64 = await predictAI(req.body.id)
+    const buffer = Buffer.from(image_base64, 'base64')
+    const dirname = __dirname.substring(__dirname.length - 7)
+    fs.writeFileSync(__dirname + path.join('output.jpg'), buffer)
 })
 
 router.post('/upload', verifyToken, (req, res, next) => {
