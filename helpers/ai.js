@@ -12,12 +12,14 @@ const predictAI = async radiographyId => {
                 id: radiographyId
             })
         })
+
+        res = await res.json()
+
+        return res.image_base64
     } catch (error) {
         return {error: {message: error.message}}
     }
-    res = await res.json()
-
-    return res.image_base64
+    
 }
 
 module.exports = {predictAI}
