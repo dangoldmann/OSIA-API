@@ -7,14 +7,8 @@ const {sendResetPasswordEmail} = require('../helpers/emailSender')
 const {apiBaseUrl} = require('../config')
 const {verifyToken} = require('../middleware/cookies.middleware')
 const jwt = require('jsonwebtoken')
-const { create } = require('../service/radiography_Service')
 
 const basePath = '/users'
-
-router.get('/all', async (req, res) => {
-    const users = await userController.getAll()
-    res.send({users})
-})
 
 router.get('/full-name', verifyToken, async (req, res) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
@@ -37,7 +31,6 @@ router.get('/info', verifyToken, async (req, res, next) => {
 router.post('/forgot-password', async (req, res, next) => {
     const {email} = req.body
 
-    // Check the email to the cookie
     const isUser = await checkUserExistance('email', email)
     
     if(!isUser) return next(createError.BadRequest('No hay ninguna cuenta asociada con este mail'))
@@ -87,7 +80,7 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
     if(password !== password2) return next(createError.BadRequest('Passwords must match'))
 
     if(password.length < 6){
-        //return next(createError.BadRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
+        return next(createError.BadRequest('La contraseña debe de ser como mínimo de 6 caracteres'))
     }
     
     const email = await getUserEmail('id', id)

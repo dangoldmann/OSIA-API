@@ -4,12 +4,6 @@ const {checkUserExistance} = require('../utils/dbFunctions')
 const createError = require('http-errors')
 
 class userService {
-    async getAll() {
-        let sql = `select * from user`
-        const [users, _] = await db.execute(sql)
-        return users
-    }
-
     async getFullName(userId) {
         let sql = `select name, surname from user where id = ${userId}`
         const [rows, _] = await db.execute(sql)
