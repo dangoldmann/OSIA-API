@@ -83,7 +83,12 @@ router.delete('/:id', verifyToken, (req, res, next) => {
 
         const dirname = __dirname.substring(0, __dirname.length - 7)
         const imagePath = await getImagePath(req.params.id)
-        fs.unlinkSync(dirname + path.join(imagePath), err => console.log(err))
+
+        try {
+            fs.unlinkSync(dirname + path.join(imagePath))
+        } catch (error) {
+            console.log(error.message)
+        }
         
         const isDeleted = await radiographyController.delete(req.params.id, next)
 
