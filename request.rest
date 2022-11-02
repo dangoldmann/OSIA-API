@@ -59,17 +59,15 @@ Content-Type: application/json
 }
 
 ### 
-POST {{baseUrl}}/radiographies/scan
-Content-Type: application/json
+GET {{baseUrl}}/radiographies/flask-test
 
-{
-    "id" : "258"
-}
+###
+GET http://localhost:6000/test
 
 ### 
-POST http://localhost:5000/predict
+POST http://localhost:6000/predict
 Content-Type: application/json
 
 {
-    "id" : "258"
+    "id" : "274"
 }

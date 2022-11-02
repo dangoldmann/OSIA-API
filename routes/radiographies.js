@@ -13,18 +13,22 @@ const fetch = require('node-fetch')
 
 const basePath = '/radiographies'
 
-router.post('/scan', upload, async (req, res) => {
-    const response = await fetch(AIUrl, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            'id':"258"
+router.post('/flask-test', async (req, res, next) => {
+    try {
+        let response = await fetch('http://0.0.0.0:6000/predict', {
+            method: 'POST',
+            headers: {
+                'Content-Type' : 'application/json'
+            },
+            body: JSON.stringify({
+                id: req.body.id
+            })
         })
-    })
-    
-    res.send(response)
+        response = await response.json()
+        res.send(response)
+    } catch (error) {
+        next(error)
+    }
 })
 
 router.post('/upload', verifyToken, (req, res, next) => {
