@@ -12,13 +12,6 @@ const {predictAI} = require('../helpers/ai')
 
 const basePath = '/radiographies'
 
-router.post('/flask-test', async (req, res, next) => {
-    const image_base64 = await predictAI(req.body.id)
-    const buffer = Buffer.from(image_base64, 'base64')
-    const dirname = __dirname.substring(__dirname.length - 7)
-    fs.writeFileSync(__dirname + path.join('output.jpg'), buffer)
-})
-
 router.post('/upload', verifyToken, (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
@@ -30,9 +23,15 @@ router.post('/upload', verifyToken, (req, res, next) => {
             const fullImageName = setImageName(req.file)
             const imageRoute = `/public/images/${payload.id}/${fullImageName}`
 
-            const radiographyInfo = {imageRoute, userId: payload.id, date: req.body['date'], injury: 'Hernia de disco'}
+            const radiographyInfo = {imageRoute, userId: payload.id, date: req.body['date']}
 
             const radiography = await radiographyController.create(radiographyInfo, next)
+
+            const aiPrediction = await predictAI(radiography.id.toString())
+            const buffer = Buffer.from(aiPrediction, 'base64')
+
+            const dirname = __dirname.substring(0, __dirname.length - 7)
+            fs.writeFileSync(dirname + path.join(imageRoute), buffer)
 
             if(radiography) res.send({
                 radiographyId: radiography.id
