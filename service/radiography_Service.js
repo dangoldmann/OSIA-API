@@ -5,13 +5,13 @@ const createError = require('http-errors')
 class radiographyService {
     async create(radiographyInfo, next) {
         try{
-            const {imageRoute, userId, date, injury} = radiographyInfo
+            const {imageRoute, userId, date} = radiographyInfo
             
             const isUser = await checkUserExistance('id', userId)
             
             if(!isUser) return next(createError.BadRequest('User not found'))
             
-            let sql = `insert into radiography (image_route, id_user, date, injury) values ('${imageRoute}', ${userId}, '${date}', '${injury}')`
+            let sql = `insert into radiography (image_route, id_user, date) values ('${imageRoute}', ${userId}, '${date}')`
             await db.execute(sql)
 
             sql = `select id from radiography where image_route = '${imageRoute}'`
@@ -35,7 +35,7 @@ class radiographyService {
             const isUser = await checkUserExistance('id', userId)
             if(!isUser) return next(createError.BadRequest('User not found'))
 
-            const sql = `select id, date, injury from radiography where id_user = ${userId}`
+            const sql = `select id, date from radiography where id_user = ${userId}`
             const [rows, _] = await db.execute(sql)
 
             return rows
