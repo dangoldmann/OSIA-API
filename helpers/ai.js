@@ -13,7 +13,7 @@ const predictAI = async radiographyId => {
             })
         })
     } catch (error) {
-        res.send({error: {message: error.message}})
+        return {error: {message: error.message}}
     }
     res = await res.json()
 
