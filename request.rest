@@ -59,13 +59,15 @@ Content-Type: application/json
 }
 
 ### 
-GET {{baseUrl}}/radiographies/flask-test
+POST {{baseUrl}}/radiographies/flask-test
+Content-Type: application/json
 
-###
-GET http://localhost:6000/test
+{
+    "id" : "274"
+}
 
 ### 
-POST http://localhost:6000/predict
+POST http://0.0.0.0:6000/predict
 Content-Type: application/json
 
 {
