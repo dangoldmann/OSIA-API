@@ -57,19 +57,3 @@ Content-Type: application/json
 {
     "imageRoute" : ""
 }
-
-### 
-POST {{baseUrl}}/radiographies/flask-test
-Content-Type: application/json
-
-{
-    "id" : "274"
-}
-
-### 
-POST http://0.0.0.0:6000/predict
-Content-Type: application/json
-
-{
-    "id" : "274"
-}
