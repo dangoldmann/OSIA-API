@@ -1,7 +1,7 @@
 //const apiBaseUrl = 'http://localhost:3000'
 const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
-const AIUrl = 'http://0.0.0.0:6000/predict'
+const AIUrl = 'https://osia-api-production.up.railway.app:5859/predict'
 
 const refreshTokenCookieOptions = {
     httpOnly: true,
