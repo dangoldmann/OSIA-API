@@ -27,12 +27,16 @@ router.post('/upload', verifyToken, (req, res, next) => {
 
             const radiography = await radiographyController.create(radiographyInfo, next)
 
-            const aiPrediction = await predictAI(radiography.id.toString())
+            try {
+                const aiPrediction = await predictAI(radiography.id.toString())
             
-            const buffer = Buffer.from(aiPrediction, 'base64')
+                const buffer = Buffer.from(aiPrediction, 'base64')
 
-            const dirname = __dirname.substring(0, __dirname.length - 7)
-            fs.writeFileSync(dirname + path.join(imageRoute), buffer)
+                const dirname = __dirname.substring(0, __dirname.length - 7)
+                fs.writeFileSync(dirname + path.join(imageRoute), buffer)
+            } catch (error) {
+                console.log(error.message)
+            }
 
             if(radiography) res.send({
                 radiographyId: radiography.id
