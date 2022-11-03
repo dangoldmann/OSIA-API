@@ -2,7 +2,7 @@ const fetch = require('node-fetch')
 const {AIUrl} = require('../config')
 
 const predictAI = async radiographyId => {
-    let res = await fetch(AIUrl, {
+    try {let res = await fetch(AIUrl, {
         method: 'POST',
         headers: {
             'Content-Type' : 'application/json'
@@ -15,6 +15,9 @@ const predictAI = async radiographyId => {
     res = await res.json()
 
     return res.image_base64
+    } catch (error) {
+        return {error: {message: error.message}}
+    }
 }
 
 module.exports = {predictAI}
