@@ -5,7 +5,7 @@ const {setImageName, filterImage} = require('../utils/multerFunctions')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        const path = `./public/images/${req.userId}`
+        const path = `./public/images`
         fs.mkdirsSync(path)
         cb(null, path)
     },
