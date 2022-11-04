@@ -9,6 +9,10 @@ class radiographyController {
         return radiography_Service.getAll(userId, next)
     }
 
+    updateImageRoute(id, newImageRoute){
+        return radiography_Service.updateImageRoute(id, newImageRoute)
+    }
+
     delete(id, next){
         return radiography_Service.delete(id, next)
     }

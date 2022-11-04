@@ -35,12 +35,23 @@ class radiographyService {
             const isUser = await checkUserExistance('id', userId)
             if(!isUser) return next(createError.BadRequest('User not found'))
 
-            const sql = `select id, date from radiography where id_user = ${userId}`
+            const sql = `select id, image_route, date from radiography where id_user = ${userId}`
             const [rows, _] = await db.execute(sql)
 
             return rows
         } catch (error) {
-            
+            console.log(error.message)
+        }
+    }
+
+    async updateImageRoute(id, newImageRoute){
+        try {
+            const sql = `update radiography set image_route = '${newImageRoute}' where id = ${id}`
+            await db.execute(sql)
+
+            return true
+        } catch (error) {
+            console.log(error.message)
         }
     }
 
