@@ -9,31 +9,43 @@ const jwt = require('jsonwebtoken')
 const path = require('path')
 const fs = require('fs')
 const {predictAI} = require('../helpers/ai')
+const cloudinary = require('../helpers/cloudinary')
+const fetch = require('node-fetch')
 
 const basePath = '/radiographies'
+const dirname = __dirname.substring(0, __dirname.length - 7)
 
 router.post('/upload', verifyToken, (req, res, next) => {
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
-        
-        req.userId = payload.id
+
         upload(req, res, async err => {
             if(err) return next(createError.BadRequest(err.message))
+            
+            const uploadToCloudinary = async path => cloudinary.upload(path, `images/${payload.id}`)
 
-            const fullImageName = setImageName(req.file)
-            const imageRoute = `/public/images/${payload.id}/${fullImageName}`
+            const imagePath = req.file.path
+            let data = await uploadToCloudinary(imagePath)
+            
+            let urls = data.url.split('/')
+            const imageRoute = `/${urls[6]}/images/${payload.id}/${urls[9]}`
 
             const radiographyInfo = {imageRoute, userId: payload.id, date: req.body['date']}
 
             const radiography = await radiographyController.create(radiographyInfo, next)
 
             try {
-                const aiPrediction = await predictAI(radiography.id.toString())
+                const aiPrediction = await predictAI(imageRoute)
             
                 const buffer = Buffer.from(aiPrediction, 'base64')
+                fs.writeFileSync(dirname + path.join(`/public/images/${req.file.filename}`), buffer)
 
-                const dirname = __dirname.substring(0, __dirname.length - 7)
-                fs.writeFileSync(dirname + path.join(imageRoute), buffer)
+                data = await uploadToCloudinary(imagePath)
+                urls = data.url.split('/')
+                const newImageRoute = `/${urls[6]}/images/${payload.id}/${urls[9]}`
+                radiographyController.updateImageRoute(radiography.id, newImageRoute)
+
+                fs.unlinkSync(imagePath)
             } catch (error) {
                 console.log(error.message)
             }
@@ -55,13 +67,6 @@ router.get('/all', verifyToken, (req, res, next) => {
     })
 })
 
-router.get('/:id', async (req, res) => {
-    const dirname = __dirname.substring(0, __dirname.length-7)
-    const imagePath = await getImagePath(req.params.id)
-    const filePath = dirname + path.join(imagePath)
-    res.sendFile(filePath)
-})
-
 router.get('/:id/result', verifyToken, (req, res) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
@@ -71,10 +76,9 @@ router.get('/:id/result', verifyToken, (req, res) => {
         if(!radiography) return
 
         const result = {
+            imageRoute: radiography.image_route,
             date: radiography.date,
-            fullName: await getUserFullName(payload.id),
-            injury: radiography.injury,
-            precision: radiography.precision
+            fullName: await getUserFullName(payload.id)
         }
 
         res.send({result})
@@ -82,21 +86,25 @@ router.get('/:id/result', verifyToken, (req, res) => {
 })
 
 router.delete('/:id', verifyToken, (req, res, next) => {
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async err => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
 
-        const dirname = __dirname.substring(0, __dirname.length - 7)
-        const imagePath = await getImagePath(req.params.id)
+        const deleteImage = async fileName => cloudinary.delete(fileName)
 
-        try {
-            fs.unlinkSync(dirname + path.join(imagePath))
-        } catch (error) {
-            console.log(error.message)
-        }
+        const imagePath = await getImagePath(req.params.id)
         
+        const pathParts = imagePath.split('/')
+        const fileName = pathParts[pathParts.length - 1].split('.')[0]
+        const cloudinaryPath = `images/${payload.id}/${fileName}`
+       
+        const result = await deleteImage(cloudinaryPath)
+       
         const isDeleted = await radiographyController.delete(req.params.id, next)
 
-        if(isDeleted) res.send({isDeleted})
+        if(isDeleted) res.send({
+            deletedFromDb: isDeleted,
+            deletedFromCloudinary: result.result == 'ok'
+        })
     })
 })
 
