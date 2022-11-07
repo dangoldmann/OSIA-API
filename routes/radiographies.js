@@ -24,7 +24,7 @@ router.post('/upload', verifyToken, (req, res, next) => {
 
             const imagePath = req.file.path
             let data = await uploadToCloudinary(imagePath)
-            
+            if(!data.url) return next(createError.BadRequest('Could not upload image due to connection error'))
             let urls = data.url.split('/')
             const imageRoute = `/${urls[6]}/images/${payload.id}/${urls[9]}`
 
