@@ -2,7 +2,7 @@
 const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
 const AIUrl = 'http://0.0.0.0:5000/predict'
-//const AIUrl = 'https://spineview-ai-production.up.railway.app'
+//const AIUrl = 'https://spineview-ai-production.up.railway.app/predict'
 
 const refreshTokenCookieOptions = {
     httpOnly: true,
