@@ -1,59 +1,78 @@
 @baseUrl = http://localhost:3000
 # @baseUrl = https://osia-api-production.up.railway.app
 
-### registrar a un nuevo usuario
+### Logout
+GET {{baseUrl}}/auth/logout
+
+### Registrar
 POST {{baseUrl}}/auth/register
 Content-Type: application/json
 
 {
-    "name" : "Dan",
-    "surname" : "Goldman",
-    "email" : "ipolonuer@gmail.com",
-    "phone" : "1138021709",
-    "password" : "osia"
+    "name" : "",
+    "surname" : "",
+    "email" : "",
+    "phone" : "",
+    "password" : ""
 }
 
-### login
+### Login
 POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "email" : "goldmandan8@gmail.com",
-    "password" : "osia"
+    "email" : "",
+    "password" : ""
 }
 
-### obtener todos los usuarios
-GET {{baseUrl}}/users/all
+### Verificar si esta loggeado
+POST {{baseUrl}}/auth/isLoggedIn
+Authorization: Bearer 
 
-### borrar un usuario
-DELETE {{baseUrl}}/users
+### Verificar si no esta loggeado
+POST {{baseUrl}}/auth/isNotLoggedIn
+Authorization: Bearer 
+
+### Solicitar un nuevo par de JWT
+POST {{baseUrl}}/auth/refresh-token
+Cookie: refresh_token=
+
+### Obtener todas las radiografias de un usuario
+GET {{baseUrl}}/radiographies/all
+Authorization: Bearer 
+
+### Obtener el resultado de una radiografía
+GET {{baseUrl}}/radiographies/:id/result
+Authorization: Bearer 
+
+### Eliminar una radiografía
+DELETE {{baseUrl}}/radiographies/:id
+Authorization: Bearer 
+
+### Obtener el nombre completo de un usuario
+GET {{baseUrl}}/users/full-name
+Authorization: Bearer 
+
+### Obtener la información de un usuario
+GET {{baseUrl}}/users/info
+Authorization: Bearer 
+
+### Renderizar la página de reestablecer contraseña
+GET {{baseUrl}}/users/reset-password/:id/:token
+
+### Enviar mail de reestablecimiento de contraseña
+POST {{baseUrl}}/users/forgot-password
 Content-Type: application/json
 
 {
     "email" : ""
 }
 
-### agregar una radiografia
-POST {{baseUrl}}/radiographies/upload
+### Reestablecer contraseña
+POST {{baseUrl}}/users/reset-password/:id/:token
 Content-Type: application/json
 
 {
-    "imageRoute" : "./public/images/1",
-    "userId" : "1"
-}
-
-### obteniendo las radiografias de un usuario
-GET {{baseUrl}}/radiographies/all
-Content-Type: application/json
-
-{
-    "userId" : "1"
-}
-
-### borrando una radiografia
-DELETE {{baseUrl}}/radiographies/delete
-Content-Type: application/json
-
-{
-    "imageRoute" : ""
+    "password" : "",
+    "password2" : ""
 }
