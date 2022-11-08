@@ -28,23 +28,6 @@ router.get('/info', verifyToken, async (req, res, next) => {
     })
 })
 
-router.post('/forgot-password', async (req, res, next) => {
-    const {email} = req.body
-
-    const isUser = await checkUserExistance('email', email)
-    
-    if(!isUser) return next(createError.BadRequest('No hay ninguna cuenta asociada con este mail'))
-
-    const id = await getUserId('email', email)
-
-    const token = signResetPasswordToken(id)
-    const link = `${apiBaseUrl}/users/reset-password/${id}/${token}`
-    
-    sendResetPasswordEmail(email, link)
-
-    res.send({message: 'Password reset link sent to your email'})
-})
-
 router.get('/reset-password/:id/:token', async (req, res, next) => {
     const {id, token} = req.params
     
@@ -60,6 +43,23 @@ router.get('/reset-password/:id/:token', async (req, res, next) => {
     }
 
     res.render('../views/reset-password')
+})
+
+router.post('/forgot-password', async (req, res, next) => {
+    const {email} = req.body
+
+    const isUser = await checkUserExistance('email', email)
+    
+    if(!isUser) return next(createError.BadRequest('No hay ninguna cuenta asociada con este mail'))
+
+    const id = await getUserId('email', email)
+
+    const token = signResetPasswordToken(id)
+    const link = `${apiBaseUrl}/users/reset-password/${id}/${token}`
+    
+    sendResetPasswordEmail(email, link)
+
+    res.send({message: 'Password reset link sent to your email'})
 })
 
 router.post('/reset-password/:id/:token', async (req, res, next) => {
@@ -93,17 +93,6 @@ router.post('/reset-password/:id/:token', async (req, res, next) => {
     const passwordReset = await userController.updatePassword(userInfo, next)
 
     if(passwordReset) return res.send({passwordReset})
-})
-
-router.delete('', async (req, res, next) => {
-    const {email} = req.body
-    
-    if(!email) return next(createError.BadRequest('You must complete all the fields'))
-    
-    userInfo = {email}
-    const isDeleted = await userController.delete(userInfo, next)
-    
-    if(isDeleted) res.send({isDeleted})
 })
 
 module.exports = {router, basePath}

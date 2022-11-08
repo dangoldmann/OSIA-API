@@ -13,6 +13,34 @@ const cloudinary = require('../helpers/cloudinary')
 const basePath = '/radiographies'
 const dirname = __dirname.substring(0, __dirname.length - 7)
 
+router.get('/all', verifyToken, (req, res, next) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
+  
+        const radiographies = await radiographyController.getAll(payload.id, next)
+        
+        if(radiographies) res.send({radiographies})
+    })
+})
+
+router.get('/:id/result', verifyToken, (req, res) => {
+    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
+        if(err) return res.send({error: createError.Unauthorized(err.message)})
+
+        const radiography = await getRadiography(req.params.id)
+
+        if(!radiography) return
+
+        const result = {
+            imageRoute: radiography.image_route,
+            date: radiography.date,
+            fullName: await getUserFullName(payload.id)
+        }
+
+        res.send({result})
+    })
+})
+
 router.post('/upload', verifyToken, (req, res, next) => {
     jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
         if(err) return res.send({error: createError.Unauthorized(err.message)})
@@ -52,34 +80,6 @@ router.post('/upload', verifyToken, (req, res, next) => {
                 radiographyId: radiography.id
             })
         })
-    })
-})
-
-router.get('/all', verifyToken, (req, res, next) => {
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
-        if(err) return res.send({error: createError.Unauthorized(err.message)})
-  
-        const radiographies = await radiographyController.getAll(payload.id, next)
-        
-        if(radiographies) res.send({radiographies})
-    })
-})
-
-router.get('/:id/result', verifyToken, (req, res) => {
-    jwt.verify(req.token, process.env.ACCESS_TOKEN_SECRET, async (err, payload) => {
-        if(err) return res.send({error: createError.Unauthorized(err.message)})
-
-        const radiography = await getRadiography(req.params.id)
-
-        if(!radiography) return
-
-        const result = {
-            imageRoute: radiography.image_route,
-            date: radiography.date,
-            fullName: await getUserFullName(payload.id)
-        }
-
-        res.send({result})
     })
 })
 

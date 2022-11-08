@@ -77,7 +77,7 @@ router.post('/isNotLoggedIn', verifyToken, (req, res) => {
     })
 })
 
-router.post('/refresh-token', (req, res, next) => {
+router.post('/refresh-token', (req, res) => {
     const refreshToken = req.cookies.refresh_token  
         
     const payload = verifyRefreshToken(refreshToken)
