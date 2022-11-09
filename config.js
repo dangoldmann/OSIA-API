@@ -1,5 +1,5 @@
-//const apiBaseUrl = 'http://localhost:3000'
-const apiBaseUrl = 'https://osia-api-production.up.railway.app'
+const apiBaseUrl = 'http://localhost:3000'
+//const apiBaseUrl = 'https://osia-api-production.up.railway.app'
 
 const AIUrl = 'http://0.0.0.0:5000/predict'
 
