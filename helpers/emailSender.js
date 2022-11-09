@@ -12,7 +12,6 @@ const sendResetPasswordEmail = (email, link) => {
                 link
             }
         })
-        .then(() => console.log('Email sent'))
         .catch(err => console.log(err.message))
 }
 
