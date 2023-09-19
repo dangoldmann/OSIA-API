@@ -4,7 +4,10 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "node index.js",
+    "createdb": "mysql -u root -prootroot -e \"create database osia\";",
+    "configdb": "mysql -u root -prootroot osia <./db/db.sql",
+    "create:full": "yarn createdb && yarn configdb"
   },
   "keywords": [],
   "author": "",
@@ -25,7 +28,8 @@
     "jsonwebtoken": "^8.5.1",
     "multer": "^1.4.5-lts.1",
     "mysql2": "^2.3.3",
-    "node-fetch": "^2.6.7"
+    "node-fetch": "^2.6.7",
+    "yarn": "^1.22.19"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
